@@ -1,0 +1,4793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ran冲冲冲">
+<meta name="theme-color" content="#ff5b8d">
+<title>🌸Ran冲冲冲</title>
+<style>
+/* ========== Reset & Base ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --pink:#ff5b8d;--pink-light:#ffd6e0;--pink-dark:#e8487a;
+  --bg:#fff9fa;--card:#ffffff;--text:#444;--text-light:#888;
+  --border:#f0e0e4;--input-bg:#f8f4f5;--shadow:0 2px 12px rgba(255,91,141,.08);
+  --shadow-hover:0 4px 20px rgba(255,91,141,.15);--radius:14px;
+  --font-scale:1;--nav-w:220px;
+}
+html{font-size:calc(15px * var(--font-scale))}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--pink);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,textarea,select{font-family:inherit;font-size:1rem;outline:none}
+ul,ol{list-style:none}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--pink-light);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent
+  .editable-text{border-bottom:1px dashed var(--pink-light);cursor:text;outline:none}
+  .editable-text:focus{border-bottom:1px solid var(--pink);background:rgba(255,91,141,0.05)}
+}
+
+/* ========== Layout ========== */
+#app{display:flex;min-height:100vh}
+#sidebar{width:var(--nav-w);background:var(--card);box-shadow:2px 0 12px rgba(255,91,141,.06);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;padding:0 0 16px;overflow-y:auto;transition:transform .3s}
+#sidebar .logo{padding:20px 18px 14px;font-size:1.15rem;font-weight:700;color:var(--pink);white-space:nowrap}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;color:var(--text);font-size:.95rem;transition:all .2s;position:relative;user-select:none}
+.nav-item:hover{background:var(--bg)}
+.nav-item.active{background:var(--pink-light);color:var(--pink);font-weight:600}
+.nav-item .emoji{font-size:1.2rem;flex-shrink:0}
+.nav-item .nav-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-item .reorder-btns{display:none;flex-direction:column;gap:1px}
+.nav-item:hover .reorder-btns{display:flex}
+.nav-item .reorder-btns button{width:18px;height:14px;background:var(--input-bg);border-radius:3px;font-size:.6rem;color:var(--text-light);display:flex;align-items:center;justify-content:center;line-height:1}
+.nav-item .reorder-btns button:disabled{opacity:.3;cursor:not-allowed}
+
+#main{flex:1;margin-left:var(--nav-w);display:flex;flex-direction:column;min-height:100vh;min-width:0}
+#topbar{position:sticky;top:0;background:rgba(255,249,250,.95);backdrop-filter:blur(8px);padding:14px 24px;font-size:1.2rem;font-weight:700;color:var(--text);z-index:50;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+#menuBtn{display:none;background:none;border:none;font-size:1.4rem;color:var(--pink);padding:0;margin-right:4px;cursor:pointer;width:36px;height:36px;align-items:center;justify-content:center;border-radius:8px}
+#menuBtn:hover{background:var(--pink-light)}
+#navOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+#content{flex:1;padding:20px 24px;max-width:1400px;width:100%}
+
+/* ========== Bottom Nav (Mobile) ========== */
+#bottomnav{display:none}
+
+/* ========== Components ========== */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px;transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card-title{font-size:1.05rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.btn{background:var(--pink);color:#fff;border-radius:10px;padding:9px 18px;font-size:.9rem;font-weight:600;transition:all .2s}
+.btn:hover{background:var(--pink-dark)}
+.btn:active{transform:scale(.96)}
+.btn-sm{padding:6px 12px;font-size:.82rem}
+.btn-outline{background:transparent;color:var(--pink);border:1.5px solid var(--pink)}
+.btn-outline:hover{background:var(--pink-light)}
+.btn-ghost{background:var(--input-bg);color:var(--text-light)}
+.btn-ghost:hover{background:var(--pink-light);color:var(--pink)}
+.btn-danger{background:#ff6b6b}
+.btn-danger:hover{background:#e85555}
+input[type="text"],input[type="number"],input[type="date"],input[type="password"],textarea,select{
+  width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--input-bg);
+  color:var(--text);font-size:.9rem;transition:border-color .2s
+}
+input:focus,textarea:focus,select:focus{border-color:var(--pink)}
+input[type="checkbox"]{width:18px;height:18px;accent-color:var(--pink);cursor:pointer}
+label{font-size:.88rem;color:var(--text);font-weight:500}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.tag-pink{background:var(--pink-light);color:var(--pink)}
+.tag-green{background:#d4edda;color:#155724}
+.tag-blue{background:#d1ecf1;color:#0c5460}
+.tag-orange{background:#fff3cd;color:#856404}
+.tag-red{background:#f8d7da;color:#721c24}
+.tag-purple{background:#e2d5f1;color:#6f42c1}
+.progress-bar{height:8px;background:var(--input-bg);border-radius:4px;overflow:hidden;margin:6px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--pink-dark));border-radius:4px;transition:width .4s}
+.stat-grid{display:grid;gap:14px}
+.stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;text-align:center}
+.stat-card .stat-value{font-size:1.6rem;font-weight:800;color:var(--pink)}
+.stat-card .stat-label{font-size:.8rem;color:var(--text-light);margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:var(--pink-light);color:var(--pink);padding:10px 8px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover{background:var(--bg)}
+.editable{cursor:text;border-radius:4px;padding:2px 4px;transition:background .2s}
+.editable:hover{background:var(--input-bg)}
+.editable:focus{background:#fff;box-shadow:0 0 0 2px var(--pink-light);outline:none}
+.task-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--input-bg);border-radius:10px;margin-bottom:8px;transition:all .2s}
+.task-item.done{opacity:.5}
+.task-item.done .task-text{text-decoration:line-through;color:var(--text-light)}
+.task-text{flex:1;font-size:.9rem}
+.quick-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;text-align:center;cursor:pointer;transition:all .2s}
+.quick-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+.quick-card .emoji{font-size:2rem;display:block;margin-bottom:8px}
+.quick-card .label{font-size:.85rem;font-weight:600;color:var(--text)}
+.note-card{background:var(--input-bg);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.note-card .note-content{font-size:.88rem;white-space:pre-wrap;word-break:break-word}
+.note-card .note-tag{margin-bottom:8px}
+.note-card .note-actions{margin-top:8px;display:flex;gap:8px}
+.section-divider{border:none;border-top:1.5px dashed var(--pink-light);margin:20px 0}
+.empty-hint{text-align:center;color:var(--text-light);font-size:.85rem;padding:24px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:600}
+.badge-pink{background:var(--pink-light);color:var(--pink)}
+.badge-green{background:#d4edda;color:#155724}
+.badge-blue{background:#d1ecf1;color:#0c5460}
+.badge-red{background:#f8d7da;color:#721c24}
+.badge-gray{background:#e9ecef;color:#666}
+.cal-ok{color:#28a745}.cal-over{color:#dc3545}.cal-under{color:#007bff}
+.pie-chart{width:120px;height:120px;border-radius:50%;position:relative;margin:0 auto}
+.pie-legend{display:flex;flex-direction:column;gap:6px;font-size:.8rem}
+.pie-legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.mini-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mini-cal .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.7rem;border-radius:6px;background:var(--input-bg);color:var(--text-light)}
+.mini-cal .day.checked{background:var(--pink);color:#fff;font-weight:700}
+.mini-cal .day.today{border:2px solid var(--pink)}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page{display:none}.page.active{display:block;animation:fadeIn .3s ease}
+.row{display:flex;gap:12px;flex-wrap:wrap}.col{flex:1;min-width:200px}
+.inline-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.inline-form .form-group{flex:1;min-width:120px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;margin-bottom:4px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:var(--radius);padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h3{margin-bottom:16px;color:var(--pink)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--pink);color:#fff;padding:10px 24px;border-radius:20px;font-size:.85rem;z-index:2000;box-shadow:0 4px 12px rgba(255,91,141,.3);animation:toastIn .3s ease;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+.fab{position:fixed;bottom:80px;right:24px;width:50px;height:50px;border-radius:50%;background:var(--pink);color:#fff;font-size:1.5rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(255,91,141,.4);z-index:60;transition:all .2s}
+.fab:hover{transform:scale(1.1);background:var(--pink-dark)}
+.firework{position:fixed;pointer-events:none;z-index:9999}
+select{cursor:pointer}
+.link-cell{color:var(--pink);text-decoration:underline;cursor:pointer}
+.delete-btn{background:none;border:none;color:#ff6b6b;font-size:.8rem;cursor:pointer;padding:2px 6px;border-radius:4px}
+.delete-btn:hover{background:#f8d7da}
+.add-btn{color:var(--pink);font-size:.85rem;font-weight:600;cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:4px}
+.add-btn:hover{text-decoration:underline}
+.range-slider{width:100%;height:6px;border-radius:3px;background:var(--input-bg);appearance:none;-webkit-appearance:none;outline:none}
+.range-slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--pink);cursor:pointer;box-shadow:0 2px 6px rgba(255,91,141,.3)}
+.range-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--pink);cursor:pointer;border:none}
+.track-tab{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.track-tab button{padding:8px 16px;border-radius:20px;font-size:.85rem;font-weight:600;background:var(--input-bg);color:var(--text-light);transition:all .2s}
+.track-tab button.active{background:var(--pink);color:#fff}
+.sub-tab{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.sub-tab button{padding:6px 12px;border-radius:8px;font-size:.8rem;background:var(--input-bg);color:var(--text-light)}
+.sub-tab button.active{background:var(--pink-light);color:var(--pink);font-weight:600}
+
+/* ========== Responsive ========== */
+@media(max-width:1200px){
+  #content{padding:16px 18px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:680px){
+  :root{--nav-w:0px}
+  #sidebar{transform:translateX(-100%);width:260px}
+  #sidebar.show{transform:translateX(0)}
+  #navOverlay.show{display:block}
+  #main{margin-left:0}
+  #content{padding:14px 12px}
+  #topbar{padding:12px 14px;font-size:1.05rem}
+  #menuBtn{display:flex}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  #bottomnav{display:none !important}
+  .fab{bottom:24px;right:16px}
+  .row{flex-direction:column}
+  .col{min-width:100%}
+  table{font-size:.78rem}
+  th,td{padding:6px 4px}
+  .modal{padding:18px;margin:10px}
+  .quick-card .emoji{font-size:1.6rem}
+}
+@media(min-width:681px) and (max-width:1200px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .content-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1201px){
+  .stat-grid{grid-template-columns:repeat(4,1fr)}
+  .content-grid{grid-template-columns:repeat(3,1fr)}
+}
+.reduce-motion *{animation:none!important;transition:none!important}
+</style>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+</head>
+<body>
+<div id="app">
+  <!-- ===== Sidebar Nav ===== -->
+  <nav id="sidebar">
+    <div class="logo">🌸Ran冲冲冲</div>
+    <div id="navList"></div>
+  </nav>
+  <div id="navOverlay"></div>
+
+  <!-- ===== Main ===== -->
+  <main id="main">
+    <header id="topbar"><button id="menuBtn" aria-label="菜单">☰</button><span id="topbarEmoji">🏠</span><span id="topbarTitle">首页</span></header>
+    <div id="content">
+
+      <!-- ========== 首页 ========== -->
+      <section id="page-home" class="page active">
+        <div class="card" style="background:linear-gradient(135deg,#ff5b8d,#ff8fab);color:#fff">
+          <div id="greeting" style="font-size:1.3rem;font-weight:700;margin-bottom:6px;cursor:text" contenteditable="true" data-home-field="greeting"></div>
+          <div id="dailyQuote" style="font-size:.95rem;opacity:.95;cursor:text" contenteditable="true" data-home-field="quote"></div>
+          <button class="btn-sm" id="favQuoteBtn" style="margin-top:10px;background:rgba(255,255,255,.25);color:#fff">💖 收藏文案</button>
+        </div>
+        <div class="card">
+          <div class="card-title">⚡ 快捷入口</div>
+          <div class="stat-grid" id="quickCards"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 今日总览</div>
+          <div class="stat-grid" id="overviewStats"></div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="card-title">🌸 每日树洞打卡</div>
+          <p style="color:var(--text-light);font-size:.85rem;margin-bottom:14px">完成今日全部任务后点击打卡，给自己一朵烟花～</p>
+          <button class="btn" id="treeHoleBtn" style="font-size:1.1rem;padding:14px 36px">🌸 今日打卡</button>
+        </div>
+      </section>
+
+      <!-- ========== 每日计划 ========== -->
+      <section id="page-plan" class="page">
+        <div class="card">
+          <div class="card-title">📋 今日待办</div>
+          <div class="inline-form" style="margin-bottom:14px">
+            <div class="form-group" style="flex:2"><input type="text" id="planInput" placeholder="输入任务..." style="width:100%"></div>
+            <div class="form-group" style="flex:1">
+              <select id="planCategory" style="width:100%">
+                <option value="thesis">📖 论文</option>
+                <option value="job">💼 求职</option>
+                <option value="sport">🏃 运动</option>
+                <option value="english">📚 英语</option>
+              </select>
+            </div>
+            <button class="btn" id="addPlanBtn">➕ 添加</button>
+          </div>
+          <div id="planList"></div>
+          <div style="margin-top:12px;font-size:.85rem;color:var(--text-light)" id="planSummary"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔁 本周固定任务</div>
+          <div class="inline-form" style="margin-bottom:14px">
+            <div class="form-group" style="flex:2"><input type="text" id="routineInput" placeholder="如：每日英语练习30分钟" style="width:100%"></div>
+            <div class="form-group" style="flex:1">
+              <select id="routineCycle" style="width:100%"><option value="daily">每日</option><option value="weekly">每周</option></select>
+            </div>
+            <button class="btn" id="addRoutineBtn">➕ 添加</button>
+          </div>
+          <div id="routineList"></div>
+        </div>
+      </section>
+
+      <!-- ========== 论文进度 ========== -->
+      <section id="page-thesis" class="page">
+        <div class="card">
+          <div class="card-title">📖 论文整体完成度</div>
+          <div class="progress-bar" style="height:14px"><div class="progress-fill" id="thesisOverall" style="width:0%"></div></div>
+          <div style="text-align:center;font-size:.85rem;color:var(--text-light);margin-top:6px" id="thesisOverallText">0%</div>
+        </div>
+        <div id="thesisMonthList"></div>
+        <div class="card">
+          <div class="card-title">📎 文件记录区</div>
+          <div class="inline-form" style="margin-bottom:10px">
+            <div class="form-group" style="flex:2"><input type="text" id="fileLinkName" placeholder="文件名称（如：初稿第三章）" style="width:100%"></div>
+            <div class="form-group" style="flex:2"><input type="text" id="fileLinkUrl" placeholder="粘贴链接URL" style="width:100%"></div>
+            <button class="btn btn-sm" id="addFileLinkBtn">➕ 添加</button>
+          </div>
+          <div id="fileLinkList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💡 难点备忘录</div>
+          <div class="inline-form" style="margin-bottom:10px">
+            <div class="form-group" style="flex:1"><input type="text" id="memoInput" placeholder="记录写作卡点、导师修改意见..." style="width:100%"></div>
+            <button class="btn btn-sm" id="addMemoBtn">➕ 添加</button>
+          </div>
+          <div id="memoList"></div>
+        </div>
+      </section>
+
+      <!-- ========== 求职备考 ========== -->
+      <section id="page-job" class="page">
+        <!-- 顶部全局数据看板 -->
+        <div class="stat-grid" style="margin-bottom:14px">
+          <div class="stat-card"><div class="stat-value" id="jobStatQuestions">0</div><div class="stat-label">本月刷题总量</div></div>
+          <div class="stat-card"><div class="stat-value" id="jobStatApps">0</div><div class="stat-label">累计投递岗位</div></div>
+          <div class="stat-card"><div class="stat-value" id="jobStatTodo">0</div><div class="stat-label">待办事项</div></div>
+          <div class="stat-card"><div class="stat-value" id="jobStatNew">0</div><div class="stat-label">本月新增进度</div></div>
+        </div>
+        <!-- Tab 切换 -->
+        <div class="track-tab" id="jobTabBar">
+          <button class="active" data-tab="study" onclick="switchJobTab('study')">📚 笔试刷题</button>
+          <button data-tab="apps" onclick="switchJobTab('apps')">📮 岗位投递</button>
+          <button data-tab="interview" onclick="switchJobTab('interview')">🎯 面试准备</button>
+          <button data-tab="plan" onclick="switchJobTab('plan')">📅 备考规划</button>
+        </div>
+        <div id="jobTabContent"></div>
+      </section>
+
+      <!-- ========== 自律打卡 ========== -->
+      <section id="page-checkin" class="page">
+        <div class="card">
+          <div class="card-title">🏃 运动打卡</div>
+          <div class="row">
+            <div class="col">
+              <div id="exerciseCal" style="display:flex;justify-content:center"></div>
+              <p style="text-align:center;font-size:.85rem;color:var(--text-light);margin-top:8px">连续打卡 <span id="exerciseStreak" style="color:var(--pink);font-weight:700">0</span> 天</p>
+            </div>
+            <div class="col">
+              <div class="form-group"><label>运动类型</label><input type="text" id="exType" placeholder="死虫式/有氧/跳绳" style="width:100%"></div>
+              <div class="row">
+                <div class="form-group" style="flex:1"><label>时长(分钟)</label><input type="number" id="exDuration" style="width:100%"></div>
+                <div class="form-group" style="flex:1"><label>消耗热量(kcal)</label><input type="number" id="exCal" style="width:100%"></div>
+              </div>
+              <div class="form-group"><label>运动感受</label><input type="text" id="exFeel" placeholder="今日运动感受" style="width:100%"></div>
+              <button class="btn btn-sm" id="exCheckinBtn">✅ 今日运动打卡</button>
+            </div>
+          </div>
+          <hr class="section-divider">
+          <div class="card-title" style="font-size:.95rem">📈 月度运动统计</div>
+          <div class="stat-grid" id="exerciseStats"></div>
+          <div id="exerciseRecords" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📖 英语每日练习打卡</div>
+          <div class="row">
+            <div class="col">
+              <div id="englishCal" style="display:flex;justify-content:center"></div>
+              <p style="text-align:center;font-size:.85rem;color:var(--text-light);margin-top:8px">连续打卡 <span id="englishStreak" style="color:var(--pink);font-weight:700">0</span> 天</p>
+            </div>
+            <div class="col">
+              <div class="form-group"><label>练习内容</label>
+                <select id="enContent" style="width:100%"><option value="单词">单词</option><option value="阅读">阅读</option><option value="口语">口语</option><option value="写作">写作</option></select>
+              </div>
+              <div class="form-group"><label>练习时长(分钟)</label><input type="number" id="enDuration" style="width:100%"></div>
+              <div class="form-group"><label>掌握知识点</label><input type="text" id="enPoints" placeholder="今日学到了什么" style="width:100%"></div>
+              <div class="form-group"><label>错题记录</label><input type="text" id="enErrors" placeholder="记录错题" style="width:100%"></div>
+              <button class="btn btn-sm" id="enCheckinBtn">✅ 今日英语打卡</button>
+            </div>
+          </div>
+          <hr class="section-divider">
+          <div class="card-title" style="font-size:.95rem">📈 每周英语掌握进度</div>
+          <div class="stat-grid" id="englishStats"></div>
+          <div id="englishRecords" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🍱 饮食打卡（快速记录）</div>
+          <p style="font-size:.85rem;color:var(--text-light);margin-bottom:10px">仅记录三餐名称，卡路里计算请前往「🍱饮食热量」页面</p>
+          <div class="row">
+            <div class="form-group"><label>早餐</label><input type="text" id="dietBreakfast" placeholder="如：燕麦粥+鸡蛋" style="width:100%"></div>
+            <div class="form-group"><label>午餐</label><input type="text" id="dietLunch" placeholder="如：鸡胸肉沙拉" style="width:100%"></div>
+            <div class="form-group"><label>晚餐</label><input type="text" id="dietDinner" placeholder="如：蔬菜汤" style="width:100%"></div>
+          </div>
+          <div style="margin-top:6px;font-size:.8rem;color:var(--text-light)">✅ 自动保存</div>
+        </div>
+      </section>
+
+      <!-- ========== 饮食热量管理 ========== -->
+      <section id="page-diet" class="page">
+        <div class="card">
+          <div class="card-title">👤 个人代谢设置</div>
+          <div class="row">
+            <div class="form-group"><label>性别</label><select id="dietGender" style="width:100%"><option value="female">女</option><option value="male">男</option></select></div>
+            <div class="form-group"><label>出生年月</label><input type="month" id="dietBirth" style="width:100%"></div>
+            <div class="form-group"><label>身高(cm)</label><input type="number" id="dietHeight" placeholder="165" style="width:100%"></div>
+            <div class="form-group"><label>体重(kg)</label><input type="number" id="dietWeight" placeholder="55" style="width:100%"></div>
+            <div class="form-group"><label>日常活动量</label>
+              <select id="dietActivity" style="width:100%">
+                <option value="1.2">久坐（几乎不运动）</option>
+                <option value="1.375">轻度运动（1-3天/周）</option>
+                <option value="1.55">中度运动（3-5天/周）</option>
+                <option value="1.725">高强度运动（6-7天/周）</option>
+              </select>
+            </div>
+          </div>
+          <div class="stat-grid" style="margin-top:10px">
+            <div class="stat-card"><div class="stat-value" id="bmrValue">--</div><div class="stat-label">基础代谢 BMR</div></div>
+            <div class="stat-card"><div class="stat-value" id="tdeeValue">--</div><div class="stat-label">每日推荐摄入(kcal)</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-editable-label="diet_card_title">🍱 分餐卡路里录入 & 📸 拍照识别</div>
+          <div class="row" id="mealTabs" style="margin-bottom:14px">
+            <button class="btn btn-sm" data-meal="breakfast" style="flex:1">🌅 早餐</button>
+            <button class="btn btn-sm btn-ghost" data-meal="lunch" style="flex:1">☀️ 午餐</button>
+            <button class="btn btn-sm btn-ghost" data-meal="dinner" style="flex:1">🌙 晚餐</button>
+            <button class="btn btn-sm btn-ghost" data-meal="snack" style="flex:1">🍎 加餐</button>
+          </div>
+          <div class="inline-form" style="margin-bottom:10px">
+            <div class="form-group" style="flex:2"><input type="text" id="foodName" placeholder="食物名称（如：鸡蛋）" style="width:100%"></div>
+            <div class="form-group" style="flex:1"><input type="number" id="foodWeight" placeholder="重量(g)" style="width:100%"></div>
+            <div class="form-group" style="flex:1"><input type="number" id="foodCal" placeholder="热量(kcal)" style="width:100%"></div>
+            <button class="btn btn-sm" id="addFoodBtn">➕ 添加</button>
+          </div>
+          <div id="foodList" style="margin-bottom:14px"></div>
+          <div id="aiUploadArea">
+            <hr class="section-divider">
+            <p style="font-size:.82rem;color:var(--text-light);margin-bottom:10px" data-editable-label="diet_ai_hint">拍下或粘贴餐食照片，AI自动识别食物和热量（需配置后端AI服务）</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+              <button class="btn btn-sm" id="cameraBtn">📸 拍照</button>
+              <button class="btn btn-sm btn-outline" id="uploadBtn">🖼️ 上传图片</button>
+              <button class="btn btn-sm btn-ghost" id="pasteHintBtn" style="position:relative" title="也可直接 Ctrl+V 粘贴截图">📋 粘贴截图</button>
+            </div>
+            <input type="file" id="foodImage" accept="image/*" capture="environment" style="display:none">
+            <div id="foodPreview" style="display:none;text-align:center;margin-bottom:12px;padding:10px;background:var(--input-bg);border-radius:10px">
+              <img id="foodPreviewImg" style="max-width:100%;max-height:300px;border-radius:8px" alt="餐食预览">
+              <div style="margin-top:6px;font-size:.78rem;color:var(--text-light)" data-editable-label="diet_preview_hint">点击图片可重新选择 / 直接粘贴可替换</div>
+            </div>
+            <button class="btn btn-sm" id="aiCalBtn" style="display:none">🔍 开始AI识别热量</button>
+            <div id="aiResult" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-editable-label="diet_summary_title">📊 当日总热量汇总</div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-value" id="totalCalToday">0</div><div class="stat-label" data-editable-label="diet_label_intake">今日摄入(kcal)</div></div>
+            <div class="stat-card"><div class="stat-value" id="recommendCal">0</div><div class="stat-label" data-editable-label="diet_label_recommend">推荐摄入(kcal)</div></div>
+            <div class="stat-card"><div class="stat-value" id="diffCal">0</div><div class="stat-label" data-editable-label="diet_label_diff">差值(kcal)</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-editable-label="diet_weight_title">📉 每日体重记录</div>
+          <div class="inline-form" style="margin-bottom:14px">
+            <div class="form-group"><label data-editable-label="diet_label_weight_date">日期</label><input type="date" id="weightDate" style="width:100%"></div>
+            <div class="form-group"><label data-editable-label="diet_label_weight">体重(kg)</label><input type="number" id="weightInput" placeholder="55.0" step="0.1" style="width:100%"></div>
+            <button class="btn btn-sm" id="addWeightBtn" style="align-self:flex-end;margin-bottom:4px">📝 记录体重</button>
+          </div>
+          <div class="stat-grid" id="weightStats">
+            <div class="stat-card"><div class="stat-value" id="weightToday">--</div><div class="stat-label" data-editable-label="diet_label_today">今日体重(kg)</div></div>
+            <div class="stat-card"><div class="stat-value" id="weightDiffDay">--</div><div class="stat-label" data-editable-label="diet_label_vs_yesterday">较昨日(kg)</div></div>
+            <div class="stat-card"><div class="stat-value" id="weightDiffWeek">--</div><div class="stat-label" data-editable-label="diet_label_vs_week">较上周(kg)</div></div>
+            <div class="stat-card"><div class="stat-value" id="weightDiffMonth">--</div><div class="stat-label" data-editable-label="diet_label_vs_month">较上月(kg)</div></div>
+          </div>
+          <div id="weightHistoryList" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-editable-label="diet_history_title">📜 历史饮食记录</div>
+          <div style="margin-bottom:10px"><input type="date" id="dietHistoryDate" style="width:auto"></div>
+          <div id="dietHistory"></div>
+        </div>
+      </section>
+
+      <!-- ========== 收支记账 ========== -->
+      <section id="page-finance" class="page">
+        <div class="card">
+          <div class="card-title">💰 今日收支录入</div>
+          <div class="row">
+            <div class="form-group"><label>类型</label>
+              <select id="finType" style="width:100%"><option value="expense">支出</option><option value="income">收入</option></select>
+            </div>
+            <div class="form-group"><label>分类</label>
+              <select id="finCategory" style="width:100%"></select>
+            </div>
+            <div class="form-group"><label>金额(¥)</label><input type="number" id="finAmount" placeholder="0.00" style="width:100%"></div>
+            <div class="form-group"><label>日期</label><input type="date" id="finDate" style="width:100%"></div>
+          </div>
+          <div class="form-group"><label>备注</label><input type="text" id="finNote" placeholder="详细备注" style="width:100%"></div>
+          <button class="btn" id="addFinBtn">➕ 记一笔</button>
+        </div>
+        <div class="card">
+          <div class="card-title">📈 月度统计</div>
+          <div class="row">
+            <div class="col">
+              <div class="stat-grid">
+                <div class="stat-card"><div class="stat-value" id="monthIncome" style="color:#28a745">¥0</div><div class="stat-label">本月收入</div></div>
+                <div class="stat-card"><div class="stat-value" id="monthExpense" style="color:#dc3545">¥0</div><div class="stat-label">本月支出</div></div>
+                <div class="stat-card"><div class="stat-value" id="monthBalance">¥0</div><div class="stat-label">月度结余</div></div>
+              </div>
+            </div>
+            <div class="col" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div id="financePie" style="width:140px;height:140px;border-radius:50%;background:#e9ecef;flex-shrink:0"></div>
+              <div id="financeLegend" class="pie-legend"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 明细台账</div>
+          <div style="margin-bottom:10px">
+            <select id="finFilterMonth" style="width:auto"><option value="">全部月份</option></select>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>日期</th><th>类型</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr></thead>
+              <tbody id="finRecordsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 每日复盘 ========== -->
+      <section id="page-review" class="page">
+        <div class="card">
+          <div class="card-title">📝 今日复盘</div>
+          <p style="font-size:.85rem;color:var(--text-light);margin-bottom:14px">温柔地回望今天，看见自己的每一步努力 🌸</p>
+          <div class="form-group"><label>✅ 今日完成</label><textarea id="rvDone" rows="3" placeholder="今天完成了哪些事情？" style="width:100%"></textarea></div>
+          <div class="form-group"><label>❌ 今日未完成</label><textarea id="rvNotDone" rows="2" placeholder="有哪些计划内的事情没做完？" style="width:100%"></textarea></div>
+          <div class="form-group"><label>💡 今日收获</label><textarea id="rvGain" rows="2" placeholder="学到了什么？有什么感悟？" style="width:100%"></textarea></div>
+          <div class="form-group"><label>😮‍💨 今日情绪卡点</label><textarea id="rvMood" rows="2" placeholder="有什么情绪波动或卡住的地方？" style="width:100%"></textarea></div>
+          <div class="form-group"><label>🔧 明日优化调整</label><textarea id="rvTomorrow" rows="2" placeholder="明天想怎么调整？" style="width:100%"></textarea></div>
+          <div style="font-size:.8rem;color:var(--text-light)">✅ 自动保存（日期：<span id="rvDate"></span>）</div>
+        </div>
+        <div class="card" id="aiReviewCard" style="display:none">
+          <div class="card-title">🤖 月度AI总结</div>
+          <button class="btn btn-sm" id="aiReviewBtn">✨ 一键生成当月总结</button>
+          <div id="aiReviewResult" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📚 历史复盘库</div>
+          <div id="reviewHistory"></div>
+        </div>
+      </section>
+
+      <!-- ========== 设置 ========== -->
+      <section id="page-settings" class="page">
+        <div class="card">
+          <div class="card-title">🔤 字体大小</div>
+          <div class="row" style="align-items:center">
+            <div class="col" style="flex:1"><input type="range" class="range-slider" id="fontSlider" min="80" max="150" step="5" value="100" style="width:100%"></div>
+            <div style="width:60px;text-align:center;font-weight:700;color:var(--pink)" id="fontValue">100%</div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button class="btn btn-sm btn-ghost" data-font="90">90%</button>
+            <button class="btn btn-sm btn-ghost" data-font="100">100%</button>
+            <button class="btn btn-sm btn-ghost" data-font="115">115%</button>
+            <button class="btn btn-sm btn-ghost" data-font="130">130%</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🧭 导航菜单自定义</div>
+          <p style="font-size:.85rem;color:var(--text-light);margin-bottom:10px">拖动箭头调整顺序，可新增/删除菜单</p>
+          <div id="navCustomList"></div>
+          <div class="inline-form" style="margin-top:14px">
+            <div class="form-group" style="flex:1"><input type="text" id="newNavEmoji" placeholder="emoji" style="width:100%"></div>
+            <div class="form-group" style="flex:2"><input type="text" id="newNavName" placeholder="菜单名称" style="width:100%"></div>
+            <button class="btn btn-sm" id="addNavBtn">➕ 新增菜单</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">💾 数据管理</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-outline" id="exportBtn">📤 导出JSON备份</button>
+            <button class="btn btn-sm btn-outline" id="importBtn">📥 导入备份</button>
+            <input type="file" id="importFile" accept=".json" style="display:none">
+            <button class="btn btn-sm btn-danger" id="clearBtn">🗑️ 清空所有数据</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">☁️ 云端同步</div>
+          <div class="form-group"><label>同步服务器地址</label><input type="text" id="syncServer" placeholder="https://your-app.onrender.com" style="width:100%"></div>
+          <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">💡 提示：当前 localhost:8888 仅提供静态文件，没有后端API。如需云端同步，请部署 server.js 到 Render 等平台，然后填写部署后的域名。</div>
+          <div id="syncLoginArea">
+            <div class="row">
+              <div class="form-group"><label>用户名</label><input type="text" id="syncUser" style="width:100%"></div>
+              <div class="form-group"><label>密码</label><input type="password" id="syncPass" style="width:100%"></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-sm" id="syncRegisterBtn">注册</button>
+              <button class="btn btn-sm" id="syncLoginBtn">登录</button>
+            </div>
+          </div>
+          <div id="syncLoggedIn" style="display:none">
+            <p style="font-size:.85rem;margin-bottom:10px">已登录：<span id="syncUserName" style="font-weight:700;color:var(--pink)"></span></p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-sm" id="syncPushBtn">⬆️ 推送数据</button>
+              <button class="btn btn-sm" id="syncPullBtn">⬇️ 拉取数据</button>
+              <button class="btn btn-sm btn-ghost" id="syncLogoutBtn">退出登录</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🤖 AI功能开关</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="aiCalToggle"> 🍱 食物卡路里图片识别</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="aiReviewToggle"> 📝 复盘AI月度总结</label>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========== 自定义页面通用模板 ========== -->
+      <section id="page-custom-template" class="page" style="display:none">
+        <div class="card">
+          <div class="card-title" id="customPageTitle">📄 自定义页面</div>
+          <div id="customPageContent"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">➕ 添加分级内容</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <select id="customAddLevel" style="width:auto;font-size:.85rem">
+              <option value="1">一级标题</option>
+              <option value="2">二级标题</option>
+              <option value="3">正文内容</option>
+            </select>
+            <input type="text" id="customAddText" placeholder="输入内容..." style="flex:1;min-width:150px">
+            <button class="btn btn-sm" id="customAddBtn">➕ 添加</button>
+          </div>
+        </div>
+      </section>
+
+
+    </div>
+  </main>
+
+  <!-- ===== Bottom Nav (Mobile) ===== -->
+  <nav id="bottomnav"></nav>
+</div>
+
+<!-- ===== Modal ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* ============================================================
+   🌸研三上岸成长站 - 全部逻辑
+   ============================================================ */
+
+/* ========== Storage Layer ========== */
+const STORE_KEY = 'yzGrowthStation_v1';
+const AUTH_KEY = 'yzGrowthAuth_v1';
+let store = {};
+let saveTimer = null;
+
+function loadStore(){
+  try{ store = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ store = {}; }
+  // Ensure all keys exist
+  const defaults = {
+    plans:[], routines:[], fileLinks:[], memos:[],
+    thesisPlan: null, // built on first load
+    jobTracks:{}, jobPlan:[],
+    exerciseLog:{}, englishLog:{}, dietCheckin:{},
+    dietProfile:{}, dietLog:{}, weightLog:{}, dietLabels:{}, currentMeal:'breakfast',
+    financeRecords:[],
+    reviews:{},
+    navOrder:[
+      {id:'home',emoji:'🏠',name:'首页'},
+      {id:'plan',emoji:'📅',name:'每日计划'},
+      {id:'thesis',emoji:'📖',name:'论文进度'},
+      {id:'job',emoji:'💼',name:'求职备考'},
+      {id:'checkin',emoji:'🏃',name:'自律打卡'},
+      {id:'diet',emoji:'🍱',name:'饮食热量'},
+      {id:'finance',emoji:'💰',name:'收支记账'},
+      {id:'review',emoji:'📝',name:'每日复盘'},
+      {id:'settings',emoji:'⚙️',name:'我的设置'}
+    ],
+    settings:{ fontScale:100, aiCal:false, aiReview:false, syncServer:'' },
+    favQuotes:[], treeHole:{}
+  };
+  for(let k in defaults){
+    if(store[k]===undefined) store[k] = defaults[k];
+  }
+  if(!store.jobTracks) store.jobTracks = {};
+  ['gov','corp','uniAdmin','uniTeacher'].forEach(t=>{
+    if(!store.jobTracks[t]) store.jobTracks[t] = { applications:[], interviewNotes:[], studyProgress:{} };
+  });
+  if(!store.thesisPlan || !store.thesisPlan.length) store.thesisPlan = buildDefaultThesisPlan();
+  // New job prep defaults
+  if(!store.jobStudyProgress) store.jobStudyProgress = {};
+  if(!store.jobStudyExpand) store.jobStudyExpand = {};
+  if(!store.jobStudyRecords) store.jobStudyRecords = [];
+  if(!store.jobAppExpand) store.jobAppExpand = {};
+  if(!store.jobInterviewNotes) store.jobInterviewNotes = [];
+  if(!store.jobPlanChecks) store.jobPlanChecks = {};
+}
+
+function saveStore(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }, 1200);
+}
+
+function saveNow(){
+  clearTimeout(saveTimer);
+  localStorage.setItem(STORE_KEY, JSON.stringify(store));
+}
+
+/* ========== Default Thesis Plan ========== */
+function buildDefaultThesisPlan(){
+  return [
+  {
+    "id": "2026-08",
+    "month": "2026年8月",
+    "goal": "选题与文献攻坚月",
+    "outcome": "✔ 最终确定论文题目、完成100篇核心文献精读笔记、文献综述初稿、论文三级写作提纲",
+    "expanded": true,
+    "weeks": [
+      {
+        "id": "2026-08-w1",
+        "label": "第1周 (8/3-8/9)",
+        "goal": "收敛选题，泛读文献",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "b2516650",
+            "date": "周一",
+            "task": "确定3个备选选题方向，梳理各方向研究现状与缺口",
+            "done": false
+          },
+          {
+            "id": "0d565ab3",
+            "date": "周二",
+            "task": "完成各方向20篇核心文献泛读，整理研究笔记",
+            "done": false
+          },
+          {
+            "id": "631f8af1",
+            "date": "周三",
+            "task": "按理论基础、研究方法、同类研究三个维度分类文献",
+            "done": false
+          },
+          {
+            "id": "4177e1d8",
+            "date": "周四",
+            "task": "对比三个选题的可行性、语料可获得性与创新空间",
+            "done": false
+          },
+          {
+            "id": "18028413",
+            "date": "周五",
+            "task": "汇总选题分析文档，列出各选题优劣势对比表",
+            "done": false
+          },
+          {
+            "id": "cde96059",
+            "date": "周六",
+            "task": "上午：精读5篇核心文献并做笔记；下午：整理选题分析框架",
+            "done": false
+          },
+          {
+            "id": "535e9f30",
+            "date": "周日",
+            "task": "本周总结：确定最终选题方向，下周目标：系统精读文献",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-08-w2",
+        "label": "第2周 (8/10-8/16)",
+        "goal": "精读文献，搭建综述框架",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "a8a3cec9",
+            "date": "周一",
+            "task": "精读理论基础维度20篇文献，整理核心理论与模型",
+            "done": false
+          },
+          {
+            "id": "31af5537",
+            "date": "周二",
+            "task": "精读研究方法维度15篇文献，标注可借鉴方法",
+            "done": false
+          },
+          {
+            "id": "de988b16",
+            "date": "周三",
+            "task": "精读同类研究维度15篇文献，归纳前人发现与研究缺口",
+            "done": false
+          },
+          {
+            "id": "95c181a1",
+            "date": "周四",
+            "task": "初步搭建文献综述框架，按主题分类整理笔记",
+            "done": false
+          },
+          {
+            "id": "7c089faf",
+            "date": "周五",
+            "task": "和导师沟通敲定最终选题，确认研究方向与核心问题",
+            "done": false
+          },
+          {
+            "id": "0e7e6ef8",
+            "date": "周六",
+            "task": "上午：精读文献并整理笔记；下午：完善综述框架结构",
+            "done": false
+          },
+          {
+            "id": "c1bb354e",
+            "date": "周日",
+            "task": "本周总结：完成50篇核心文献精读，下周目标：撰写综述主体",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-08-w3",
+        "label": "第3周 (8/17-8/23)",
+        "goal": "撰写综述，搭建提纲",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "1f9113d8",
+            "date": "周一",
+            "task": "完成文献综述主体撰写，梳理研究脉络与现有不足",
+            "done": false
+          },
+          {
+            "id": "11b4e49b",
+            "date": "周二",
+            "task": "搭建论文完整三级提纲，明确每小节写作内容与字数",
+            "done": false
+          },
+          {
+            "id": "e4155df7",
+            "date": "周三",
+            "task": "补充阅读20篇文献，完善综述中薄弱部分",
+            "done": false
+          },
+          {
+            "id": "e0dbde81",
+            "date": "周四",
+            "task": "整理全部100篇文献笔记，建立Zotero文献库",
+            "done": false
+          },
+          {
+            "id": "fd377194",
+            "date": "周五",
+            "task": "规划各章节字数分配，制定写作时间线",
+            "done": false
+          },
+          {
+            "id": "3c896152",
+            "date": "周六",
+            "task": "上午：撰写综述；下午：完善三级提纲细节",
+            "done": false
+          },
+          {
+            "id": "a59f6dc8",
+            "date": "周日",
+            "task": "本周总结：综述主体完成，提纲定稿，下周目标：完善综述并准备开题",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-08-w4",
+        "label": "第4周 (8/24-8/31)",
+        "goal": "完善综述，准备开题",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "c2400344",
+            "date": "周一",
+            "task": "修改完善文献综述，优化逻辑与学术表达",
+            "done": false
+          },
+          {
+            "id": "e4313e7f",
+            "date": "周二",
+            "task": "撰写开题报告核心部分：研究背景、意义、问题",
+            "done": false
+          },
+          {
+            "id": "b34d1456",
+            "date": "周三",
+            "task": "整理参考文献列表，统一引用格式",
+            "done": false
+          },
+          {
+            "id": "32c5841b",
+            "date": "周四",
+            "task": "和导师做开题前预沟通，确认研究方案可行性",
+            "done": false
+          },
+          {
+            "id": "52987d6c",
+            "date": "周五",
+            "task": "补充研究设计内容，明确语料来源与分析框架",
+            "done": false
+          },
+          {
+            "id": "dbdb0795",
+            "date": "周六",
+            "task": "上午：修改综述；下午：撰写开题报告",
+            "done": false
+          },
+          {
+            "id": "90e4b012",
+            "date": "周日",
+            "task": "🎉 8月成果：选题确定、100篇文献精读、综述初稿、三级提纲",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2026-09",
+    "month": "2026年9月",
+    "goal": "开题报告与答辩月",
+    "outcome": "✔ 完整开题报告、开题答辩PPT、通过开题答辩、最终版写作大纲",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2026-09-w1",
+        "label": "第1周 (9/1-9/7)",
+        "goal": "补充开题报告",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "89f7b3f3",
+            "date": "周一",
+            "task": "补充研究设计、创新点、难点、进度安排等内容",
+            "done": false
+          },
+          {
+            "id": "9d222782",
+            "date": "周二",
+            "task": "整理参考文献，形成完整开题报告初稿",
+            "done": false
+          },
+          {
+            "id": "a56371a0",
+            "date": "周三",
+            "task": "明确语料来源与编码规则，优化创新点表述",
+            "done": false
+          },
+          {
+            "id": "af6dc201",
+            "date": "周四",
+            "task": "检查开题报告结构完整性，润色语言表达",
+            "done": false
+          },
+          {
+            "id": "24c8b131",
+            "date": "周五",
+            "task": "提交导师审阅，记录初步反馈意见",
+            "done": false
+          },
+          {
+            "id": "19daec6d",
+            "date": "周六",
+            "task": "上午：完善研究设计；下午：整理参考文献",
+            "done": false
+          },
+          {
+            "id": "5c7be359",
+            "date": "周日",
+            "task": "本周总结：开题报告初稿完成，下周目标：修改完善",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-09-w2",
+        "label": "第2周 (9/8-9/14)",
+        "goal": "修改完善开题报告",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "e0660a72",
+            "date": "周一",
+            "task": "根据导师反馈调整内容结构，修改研究方案",
+            "done": false
+          },
+          {
+            "id": "1a442770",
+            "date": "周二",
+            "task": "补充研究方法细节，完善语料说明",
+            "done": false
+          },
+          {
+            "id": "f3d71275",
+            "date": "周三",
+            "task": "优化创新点表述，增强论证说服力",
+            "done": false
+          },
+          {
+            "id": "6486c98f",
+            "date": "周四",
+            "task": "检查全文逻辑连贯性，统一术语表达",
+            "done": false
+          },
+          {
+            "id": "635d38fd",
+            "date": "周五",
+            "task": "再次提交导师审阅，确认修改方向",
+            "done": false
+          },
+          {
+            "id": "3992828f",
+            "date": "周六",
+            "task": "上午：修改核心内容；下午：润色语言",
+            "done": false
+          },
+          {
+            "id": "7167458f",
+            "date": "周日",
+            "task": "本周总结：开题报告修改完成，下周目标：准备答辩",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-09-w3",
+        "label": "第3周 (9/15-9/21)",
+        "goal": "准备开题答辩",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "c000a762",
+            "date": "周一",
+            "task": "制作开题答辩PPT，突出研究问题与创新点",
+            "done": false
+          },
+          {
+            "id": "8ebcedab",
+            "date": "周二",
+            "task": "整理答辩常见问题与回答思路",
+            "done": false
+          },
+          {
+            "id": "25081d61",
+            "date": "周三",
+            "task": "完成1-2次模拟陈述，把控答辩时长",
+            "done": false
+          },
+          {
+            "id": "580a8c61",
+            "date": "周四",
+            "task": "补充PPT中的图表与案例说明",
+            "done": false
+          },
+          {
+            "id": "6de6e936",
+            "date": "周五",
+            "task": "请导师指导答辩陈述，优化表达节奏",
+            "done": false
+          },
+          {
+            "id": "e1af7bfc",
+            "date": "周六",
+            "task": "上午：完善PPT；下午：模拟答辩练习",
+            "done": false
+          },
+          {
+            "id": "06a1bc0c",
+            "date": "周日",
+            "task": "本周总结：答辩准备就绪，下周目标：正式答辩",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-09-w4",
+        "label": "第4周 (9/22-9/30)",
+        "goal": "开题答辩与调整",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "5cc439f2",
+            "date": "周一",
+            "task": "参加开题答辩，完整陈述研究内容",
+            "done": false
+          },
+          {
+            "id": "9169c289",
+            "date": "周二",
+            "task": "记录评审委员会意见与建议",
+            "done": false
+          },
+          {
+            "id": "9a2c53cf",
+            "date": "周三",
+            "task": "根据答辩意见调整论文框架与研究方案",
+            "done": false
+          },
+          {
+            "id": "720a50d8",
+            "date": "周四",
+            "task": "确定最终正式写作大纲，锁定研究方向",
+            "done": false
+          },
+          {
+            "id": "ff0e203a",
+            "date": "周五",
+            "task": "整理答辩材料归档，更新进度表",
+            "done": false
+          },
+          {
+            "id": "9d836543",
+            "date": "周六",
+            "task": "上午：修改论文框架；下午：完善研究方案",
+            "done": false
+          },
+          {
+            "id": "8fc214a5",
+            "date": "周日",
+            "task": "🎉 9月成果：通过开题答辩，最终写作大纲确定",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2026-10",
+    "month": "2026年10月",
+    "goal": "基础章节与研究实施月",
+    "outcome": "✔ 绪论、理论基础两章定稿，完成语料/数据的收集、标注与整理",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2026-10-w1",
+        "label": "第1周 (10/1-10/7)",
+        "goal": "撰写绪论章节",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "2639ac6e",
+            "date": "周一",
+            "task": "撰写研究背景，说明选题缘起与现实意义",
+            "done": false
+          },
+          {
+            "id": "ed27ecf8",
+            "date": "周二",
+            "task": "阐述研究意义，分理论意义与实践意义展开",
+            "done": false
+          },
+          {
+            "id": "2308ae52",
+            "date": "周三",
+            "task": "明确研究问题，提出具体研究目标",
+            "done": false
+          },
+          {
+            "id": "17e7c325",
+            "date": "周四",
+            "task": "介绍研究方法，说明研究思路与论文结构",
+            "done": false
+          },
+          {
+            "id": "d2e00733",
+            "date": "周五",
+            "task": "界定核心概念，规范学术表达",
+            "done": false
+          },
+          {
+            "id": "285813a7",
+            "date": "周六",
+            "task": "上午：撰写背景与意义；下午：完善研究问题与方法",
+            "done": false
+          },
+          {
+            "id": "73c4e21d",
+            "date": "周日",
+            "task": "本周总结：绪论章节初稿完成，下周目标：理论基础",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-10-w2",
+        "label": "第2周 (10/8-10/14)",
+        "goal": "撰写理论基础章节",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "6f1bfd79",
+            "date": "周一",
+            "task": "分小节阐述核心理论，建立理论框架",
+            "done": false
+          },
+          {
+            "id": "ed37a567",
+            "date": "周二",
+            "task": "说明理论在本研究中的具体应用",
+            "done": false
+          },
+          {
+            "id": "7a8bb469",
+            "date": "周三",
+            "task": "梳理核心概念的发展脉络与学术争议",
+            "done": false
+          },
+          {
+            "id": "5590cb30",
+            "date": "周四",
+            "task": "核对文献引用准确性，补充遗漏引用",
+            "done": false
+          },
+          {
+            "id": "4178abca",
+            "date": "周五",
+            "task": "检查理论章节的逻辑衔接与论证充分性",
+            "done": false
+          },
+          {
+            "id": "1c9e72b2",
+            "date": "周六",
+            "task": "上午：撰写理论小节；下午：核对引用与数据",
+            "done": false
+          },
+          {
+            "id": "1f9050b3",
+            "date": "周日",
+            "task": "本周总结：理论基础章节初稿完成，下周目标：语料收集",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-10-w3",
+        "label": "第3周 (10/15-10/21)",
+        "goal": "语料收集与标注",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "09ca2f64",
+            "date": "周一",
+            "task": "按研究设计收集语料/问卷/访谈内容",
+            "done": false
+          },
+          {
+            "id": "700cfd82",
+            "date": "周二",
+            "task": "完成语料标注、分类与编码",
+            "done": false
+          },
+          {
+            "id": "fc7f5cbb",
+            "date": "周三",
+            "task": "搭建研究数据库，建立数据管理规范",
+            "done": false
+          },
+          {
+            "id": "dc0e6ecd",
+            "date": "周四",
+            "task": "生成基础统计图表，检查数据完整性",
+            "done": false
+          },
+          {
+            "id": "5e93d673",
+            "date": "周五",
+            "task": "备份所有原始数据，建立数据字典",
+            "done": false
+          },
+          {
+            "id": "64b7b4cb",
+            "date": "周六",
+            "task": "上午：收集语料；下午：标注与编码",
+            "done": false
+          },
+          {
+            "id": "50619f5e",
+            "date": "周日",
+            "task": "本周总结：语料收集完成，数据库搭建，下周目标：核对优化",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-10-w4",
+        "label": "第4周 (10/22-10/31)",
+        "goal": "核对优化与规划",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "d9bdf536",
+            "date": "周一",
+            "task": "核对语料标注一致性，修正编码错误",
+            "done": false
+          },
+          {
+            "id": "dbf84133",
+            "date": "周二",
+            "task": "优化前两章内容与章节过渡段落",
+            "done": false
+          },
+          {
+            "id": "747a05c1",
+            "date": "周三",
+            "task": "规划第三章分析章节写作框架",
+            "done": false
+          },
+          {
+            "id": "06ead05c",
+            "date": "周四",
+            "task": "整理研究数据库，导出分析用数据集",
+            "done": false
+          },
+          {
+            "id": "622144ec",
+            "date": "周五",
+            "task": "通读前两章，修正错别字与语病",
+            "done": false
+          },
+          {
+            "id": "670f8568",
+            "date": "周六",
+            "task": "上午：核对语料；下午：优化章节衔接",
+            "done": false
+          },
+          {
+            "id": "b8453fa3",
+            "date": "周日",
+            "task": "🎉 10月成果：前两章定稿，语料收集整理完成",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2026-11",
+    "month": "2026年11月",
+    "goal": "核心分析章节攻坚月",
+    "outcome": "✔ 论文第三、四章（偏误分析/对比分析/实证研究）初稿",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2026-11-w1",
+        "label": "第1周 (11/1-11/7)",
+        "goal": "第三章研究设计与语料说明",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "ae75f82b",
+            "date": "周一",
+            "task": "完成研究设计部分，说明研究对象与工具",
+            "done": false
+          },
+          {
+            "id": "5f359e62",
+            "date": "周二",
+            "task": "撰写语料说明，呈现描述性统计结果",
+            "done": false
+          },
+          {
+            "id": "ad04c2ff",
+            "date": "周三",
+            "task": "制作对应图表，做基础分类解读",
+            "done": false
+          },
+          {
+            "id": "5f937762",
+            "date": "周四",
+            "task": "核对数据与图表对应关系",
+            "done": false
+          },
+          {
+            "id": "1d5dd164",
+            "date": "周五",
+            "task": "检查研究方法描述的完整性",
+            "done": false
+          },
+          {
+            "id": "40ca3094",
+            "date": "周六",
+            "task": "上午：撰写研究设计；下午：制作图表",
+            "done": false
+          },
+          {
+            "id": "891f357e",
+            "date": "周日",
+            "task": "本周总结：第三章前半部分完成，下周目标：分类分析",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-11-w2",
+        "label": "第2周 (11/8-11/14)",
+        "goal": "第三章分类分析",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "c7745894",
+            "date": "周一",
+            "task": "按研究维度逐一展开分类分析",
+            "done": false
+          },
+          {
+            "id": "f3aed335",
+            "date": "周二",
+            "task": "补充典型语料案例，增强论证说服力",
+            "done": false
+          },
+          {
+            "id": "f8729e94",
+            "date": "周三",
+            "task": "核对所有数据与图表对应关系",
+            "done": false
+          },
+          {
+            "id": "986c691c",
+            "date": "周四",
+            "task": "完善第三章的逻辑衔接与段落过渡",
+            "done": false
+          },
+          {
+            "id": "9d3645ce",
+            "date": "周五",
+            "task": "检查术语表达的一致性",
+            "done": false
+          },
+          {
+            "id": "3be09b4b",
+            "date": "周六",
+            "task": "上午：撰写分类分析；下午：补充案例",
+            "done": false
+          },
+          {
+            "id": "10af8ea9",
+            "date": "周日",
+            "task": "本周总结：第三章初稿完成，下周目标：第四章深度分析",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-11-w3",
+        "label": "第3周 (11/15-11/21)",
+        "goal": "第四章深度分析",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "67bc9b6b",
+            "date": "周一",
+            "task": "结合理论解释现象成因",
+            "done": false
+          },
+          {
+            "id": "100c4ce1",
+            "date": "周二",
+            "task": "对比前人研究结论，指出异同",
+            "done": false
+          },
+          {
+            "id": "8b0006e3",
+            "date": "周三",
+            "task": "梳理教学启示与实践价值",
+            "done": false
+          },
+          {
+            "id": "209cebef",
+            "date": "周四",
+            "task": "补充深度分析中的数据支撑",
+            "done": false
+          },
+          {
+            "id": "28b7849e",
+            "date": "周五",
+            "task": "检查论证链条的完整性",
+            "done": false
+          },
+          {
+            "id": "1c2f9651",
+            "date": "周六",
+            "task": "上午：撰写深度分析；下午：对比前人研究",
+            "done": false
+          },
+          {
+            "id": "55357e39",
+            "date": "周日",
+            "task": "本周总结：第四章初稿完成，下周目标：调整完善",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-11-w4",
+        "label": "第4周 (11/22-11/30)",
+        "goal": "调整完善",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "638c834c",
+            "date": "周一",
+            "task": "通读第三、四章，调整逻辑顺序",
+            "done": false
+          },
+          {
+            "id": "5e464e5d",
+            "date": "周二",
+            "task": "统一术语表达，修正数据错误",
+            "done": false
+          },
+          {
+            "id": "b736cb96",
+            "date": "周三",
+            "task": "和导师沟通确认写作方向",
+            "done": false
+          },
+          {
+            "id": "2c3b9a7b",
+            "date": "周四",
+            "task": "补充遗漏的分析维度",
+            "done": false
+          },
+          {
+            "id": "8007fd8d",
+            "date": "周五",
+            "task": "优化图表说明与正文呼应",
+            "done": false
+          },
+          {
+            "id": "784a69b1",
+            "date": "周六",
+            "task": "上午：调整逻辑；下午：统一术语",
+            "done": false
+          },
+          {
+            "id": "32526693",
+            "date": "周日",
+            "task": "🎉 11月成果：第三、四章主体章节初稿完成",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2026-12",
+    "month": "2026年12月",
+    "goal": "全文初稿合拢月",
+    "outcome": "✔ 论文全文初稿（含结论与展望、参考文献、附录）",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2026-12-w1",
+        "label": "第1周 (12/1-12/7)",
+        "goal": "结论与展望",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "74340b26",
+            "date": "周一",
+            "task": "分点呈现核心研究结论",
+            "done": false
+          },
+          {
+            "id": "e673da9f",
+            "date": "周二",
+            "task": "分析研究局限与不足",
+            "done": false
+          },
+          {
+            "id": "1573cbc1",
+            "date": "周三",
+            "task": "提出教学建议与未来研究方向",
+            "done": false
+          },
+          {
+            "id": "25a63938",
+            "date": "周四",
+            "task": "检查结论与前文分析的一致性",
+            "done": false
+          },
+          {
+            "id": "ba55fff9",
+            "date": "周五",
+            "task": "润色结论章节的学术表达",
+            "done": false
+          },
+          {
+            "id": "bd172eda",
+            "date": "周六",
+            "task": "上午：撰写结论；下午：完善展望部分",
+            "done": false
+          },
+          {
+            "id": "1267f593",
+            "date": "周日",
+            "task": "本周总结：结论与展望完成，下周目标：参考文献",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-12-w2",
+        "label": "第2周 (12/8-12/14)",
+        "goal": "参考文献与附录",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "93c753fc",
+            "date": "周一",
+            "task": "整理全文参考文献，按学校要求统一格式",
+            "done": false
+          },
+          {
+            "id": "f5441f97",
+            "date": "周二",
+            "task": "核对正文引用与参考文献一一对应",
+            "done": false
+          },
+          {
+            "id": "6c018532",
+            "date": "周三",
+            "task": "整理附录材料：语料表、问卷、访谈提纲等",
+            "done": false
+          },
+          {
+            "id": "d8180fdf",
+            "date": "周四",
+            "task": "检查引用格式规范性",
+            "done": false
+          },
+          {
+            "id": "19fa358a",
+            "date": "周五",
+            "task": "补充遗漏的参考文献",
+            "done": false
+          },
+          {
+            "id": "1ab29d9a",
+            "date": "周六",
+            "task": "上午：整理文献；下午：制作附录",
+            "done": false
+          },
+          {
+            "id": "7064e9ca",
+            "date": "周日",
+            "task": "本周总结：参考文献与附录完成，下周目标：拼接全文",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-12-w3",
+        "label": "第3周 (12/15-12/21)",
+        "goal": "拼接全文",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "9b190f64",
+            "date": "周一",
+            "task": "将所有章节拼接为完整文档",
+            "done": false
+          },
+          {
+            "id": "1ab4b0b0",
+            "date": "周二",
+            "task": "调整页码与章节顺序",
+            "done": false
+          },
+          {
+            "id": "cfeb13ce",
+            "date": "周三",
+            "task": "修正逻辑断层，补充过渡段落",
+            "done": false
+          },
+          {
+            "id": "b32b000e",
+            "date": "周四",
+            "task": "统一全文格式与字体",
+            "done": false
+          },
+          {
+            "id": "31da60f4",
+            "date": "周五",
+            "task": "检查图表编号连续性",
+            "done": false
+          },
+          {
+            "id": "a9f785bb",
+            "date": "周六",
+            "task": "上午：拼接文档；下午：调整格式",
+            "done": false
+          },
+          {
+            "id": "35a143f6",
+            "date": "周日",
+            "task": "本周总结：全文拼接完成，下周目标：通读校对",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2026-12-w4",
+        "label": "第4周 (12/22-12/31)",
+        "goal": "通读校对",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "f46c51dc",
+            "date": "周一",
+            "task": "全文通读，修正错别字与语病",
+            "done": false
+          },
+          {
+            "id": "b8850e99",
+            "date": "周二",
+            "task": "检查逻辑连贯性与论证充分性",
+            "done": false
+          },
+          {
+            "id": "3d571a74",
+            "date": "周三",
+            "task": "形成完整初稿提交导师",
+            "done": false
+          },
+          {
+            "id": "9794f480",
+            "date": "周四",
+            "task": "整理写作疑问，准备与导师沟通",
+            "done": false
+          },
+          {
+            "id": "8c4eecd4",
+            "date": "周五",
+            "task": "备份初稿各版本",
+            "done": false
+          },
+          {
+            "id": "d5112cdf",
+            "date": "周六",
+            "task": "上午：通读校对；下午：整理疑问清单",
+            "done": false
+          },
+          {
+            "id": "d03610a7",
+            "date": "周日",
+            "task": "🎉 12月成果：论文全文初稿完成",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2027-01",
+    "month": "2027年1月",
+    "goal": "寒假初稿大修月",
+    "outcome": "✔ 论文二稿，解决结构、逻辑、核心内容层面的问题",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2027-01-w1",
+        "label": "第1周 (1/1-1/4)",
+        "goal": "整理反馈，制定计划",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "a43ac5d7",
+            "date": "周一",
+            "task": "逐条整理导师初稿反馈",
+            "done": false
+          },
+          {
+            "id": "d491f4bf",
+            "date": "周二",
+            "task": "按结构、内容、格式分类并标注优先级",
+            "done": false
+          },
+          {
+            "id": "0a588581",
+            "date": "周三",
+            "task": "制定寒假详细修改计划",
+            "done": false
+          },
+          {
+            "id": "db30fa38",
+            "date": "周四",
+            "task": "列出所有待修改问题清单",
+            "done": false
+          },
+          {
+            "id": "7d496d3a",
+            "date": "周五",
+            "task": "确定修改顺序与时间节点",
+            "done": false
+          },
+          {
+            "id": "8f15ace6",
+            "date": "周六",
+            "task": "上午：整理反馈；下午：制定计划",
+            "done": false
+          },
+          {
+            "id": "a32238b8",
+            "date": "周日",
+            "task": "本周总结：修改计划制定完成，下周目标：核心修改",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-01-w2",
+        "label": "第2周 (1/5-1/11)",
+        "goal": "结构与核心内容修改",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "8dc9d38e",
+            "date": "周一",
+            "task": "针对结构问题修改，调整章节布局",
+            "done": false
+          },
+          {
+            "id": "68c11753",
+            "date": "周二",
+            "task": "补充分析维度，完善论证深度",
+            "done": false
+          },
+          {
+            "id": "b0fabfe7",
+            "date": "周三",
+            "task": "修正数据与论据错误",
+            "done": false
+          },
+          {
+            "id": "f4d2bda8",
+            "date": "周四",
+            "task": "检查修改后的逻辑连贯性",
+            "done": false
+          },
+          {
+            "id": "1089389f",
+            "date": "周五",
+            "task": "补充研究内容薄弱环节",
+            "done": false
+          },
+          {
+            "id": "c568b91c",
+            "date": "周六",
+            "task": "上午：调整结构；下午：补充内容",
+            "done": false
+          },
+          {
+            "id": "d06e65de",
+            "date": "周日",
+            "task": "本周总结：结构与核心问题修改完成，下周目标：语言优化",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-01-w3",
+        "label": "第3周 (1/12-1/18)",
+        "goal": "学术表达优化",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "e7baf28c",
+            "date": "周一",
+            "task": "逐段优化学术表达，修正口语化表述",
+            "done": false
+          },
+          {
+            "id": "b5cd10c9",
+            "date": "周二",
+            "task": "梳理段落与章节逻辑链条",
+            "done": false
+          },
+          {
+            "id": "50d5f648",
+            "date": "周三",
+            "task": "完善图表与正文的呼应关系",
+            "done": false
+          },
+          {
+            "id": "5d2b5479",
+            "date": "周四",
+            "task": "统一全文术语与表达风格",
+            "done": false
+          },
+          {
+            "id": "061b7e75",
+            "date": "周五",
+            "task": "检查引用格式与文献对应",
+            "done": false
+          },
+          {
+            "id": "d1794302",
+            "date": "周六",
+            "task": "上午：优化表达；下午：梳理逻辑",
+            "done": false
+          },
+          {
+            "id": "a2bff2cb",
+            "date": "周日",
+            "task": "本周总结：语言优化完成，下周目标：形成二稿",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-01-w4",
+        "label": "第4周 (1/19-1/25)",
+        "goal": "形成二稿",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "b88dacbd",
+            "date": "周一",
+            "task": "完成第二轮通读校对",
+            "done": false
+          },
+          {
+            "id": "b5771b58",
+            "date": "周二",
+            "task": "确认所有修改全部落实",
+            "done": false
+          },
+          {
+            "id": "1e606543",
+            "date": "周三",
+            "task": "形成二稿提交导师",
+            "done": false
+          },
+          {
+            "id": "4cae7dab",
+            "date": "周四",
+            "task": "同步撰写修改说明文档",
+            "done": false
+          },
+          {
+            "id": "bf479dc7",
+            "date": "周五",
+            "task": "备份二稿各版本",
+            "done": false
+          },
+          {
+            "id": "4c84da79",
+            "date": "周六",
+            "task": "上午：通读校对；下午：整理修改说明",
+            "done": false
+          },
+          {
+            "id": "bd302cf8",
+            "date": "周日",
+            "task": "🎉 1月成果：论文二稿完成",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2027-02",
+    "month": "2027年2月",
+    "goal": "细节打磨与格式规范月",
+    "outcome": "✔ 论文三稿，内容定型且格式符合学院规范",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2027-02-w1",
+        "label": "第1周 (2/1-2/7)",
+        "goal": "细节修改",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "d8245725",
+            "date": "周一",
+            "task": "接收二稿反馈，针对性修改细节问题",
+            "done": false
+          },
+          {
+            "id": "9b5fdb19",
+            "date": "周二",
+            "task": "补充论证薄弱小节",
+            "done": false
+          },
+          {
+            "id": "e0146fdf",
+            "date": "周三",
+            "task": "完善案例与语料说明",
+            "done": false
+          },
+          {
+            "id": "0e4b86f2",
+            "date": "周四",
+            "task": "优化结论表述，增强说服力",
+            "done": false
+          },
+          {
+            "id": "dee464c7",
+            "date": "周五",
+            "task": "检查数据引用的准确性",
+            "done": false
+          },
+          {
+            "id": "19f72ea7",
+            "date": "周六",
+            "task": "上午：修改细节；下午：补充案例",
+            "done": false
+          },
+          {
+            "id": "d1e6b3d5",
+            "date": "周日",
+            "task": "本周总结：细节修改完成，下周目标：格式规范",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-02-w2",
+        "label": "第2周 (2/8-2/14)",
+        "goal": "格式规范",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "822b7044",
+            "date": "周一",
+            "task": "对照学校格式规范调整字体、行距",
+            "done": false
+          },
+          {
+            "id": "8ca4fb36",
+            "date": "周二",
+            "task": "统一页边距、页眉页脚",
+            "done": false
+          },
+          {
+            "id": "27e9df8d",
+            "date": "周三",
+            "task": "规范图表、公式与脚注格式",
+            "done": false
+          },
+          {
+            "id": "e66dd872",
+            "date": "周四",
+            "task": "检查页码与目录对应",
+            "done": false
+          },
+          {
+            "id": "ec77b72b",
+            "date": "周五",
+            "task": "统一参考文献格式",
+            "done": false
+          },
+          {
+            "id": "58502ac7",
+            "date": "周六",
+            "task": "上午：调整格式；下午：检查规范",
+            "done": false
+          },
+          {
+            "id": "3d4f4426",
+            "date": "周日",
+            "task": "本周总结：格式规范完成，下周目标：查重降重",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-02-w3",
+        "label": "第3周 (2/15-2/21)",
+        "goal": "首次查重降重",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "e311ec9c",
+            "date": "周一",
+            "task": "完成首次查重，记录重复率",
+            "done": false
+          },
+          {
+            "id": "b39f7afd",
+            "date": "周二",
+            "task": "针对标红部分改写降重",
+            "done": false
+          },
+          {
+            "id": "ef5f931c",
+            "date": "周三",
+            "task": "通过替换表述、调整句式降低重复率",
+            "done": false
+          },
+          {
+            "id": "a74295a6",
+            "date": "周四",
+            "task": "规范引用格式，区分合理引用",
+            "done": false
+          },
+          {
+            "id": "7319bcf1",
+            "date": "周五",
+            "task": "检查改写后的语句通顺性",
+            "done": false
+          },
+          {
+            "id": "3adcded2",
+            "date": "周六",
+            "task": "上午：查重分析；下午：改写降重",
+            "done": false
+          },
+          {
+            "id": "d23901bb",
+            "date": "周日",
+            "task": "本周总结：首次降重完成，下周目标：确认达标",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-02-w4",
+        "label": "第4周 (2/22-2/28)",
+        "goal": "确认达标",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "f1cd1c82",
+            "date": "周一",
+            "task": "降重后二次查重确认达标",
+            "done": false
+          },
+          {
+            "id": "a0cc2f79",
+            "date": "周二",
+            "task": "通读检查语句通顺性",
+            "done": false
+          },
+          {
+            "id": "5b1868b2",
+            "date": "周三",
+            "task": "形成三稿提交导师最终确认",
+            "done": false
+          },
+          {
+            "id": "58ab272e",
+            "date": "周四",
+            "task": "整理查重报告与修改记录",
+            "done": false
+          },
+          {
+            "id": "b864a0ea",
+            "date": "周五",
+            "task": "备份三稿各版本",
+            "done": false
+          },
+          {
+            "id": "8d4ea393",
+            "date": "周六",
+            "task": "上午：二次查重；下午：通读检查",
+            "done": false
+          },
+          {
+            "id": "25375d20",
+            "date": "周日",
+            "task": "🎉 2月成果：论文三稿完成，重复率达标",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2027-03",
+    "month": "2027年3月",
+    "goal": "终稿确认与盲审提交月",
+    "outcome": "✔ 论文送审版终稿、全套盲审材料",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2027-03-w1",
+        "label": "第1周 (3/1-3/7)",
+        "goal": "终稿审核",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "3d34c0c8",
+            "date": "周一",
+            "task": "配合导师完成终稿审核",
+            "done": false
+          },
+          {
+            "id": "77dfa8ae",
+            "date": "周二",
+            "task": "做最后内容微调",
+            "done": false
+          },
+          {
+            "id": "593a0e8c",
+            "date": "周三",
+            "task": "确认论文无原则性错误",
+            "done": false
+          },
+          {
+            "id": "a2c798fe",
+            "date": "周四",
+            "task": "锁定内容不再大改",
+            "done": false
+          },
+          {
+            "id": "7f1f1116",
+            "date": "周五",
+            "task": "整理最终修改记录",
+            "done": false
+          },
+          {
+            "id": "c9089261",
+            "date": "周六",
+            "task": "上午：导师沟通；下午：微调修改",
+            "done": false
+          },
+          {
+            "id": "836667e4",
+            "date": "周日",
+            "task": "本周总结：终稿审核完成，下周目标：盲审材料",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-03-w2",
+        "label": "第2周 (3/8-3/14)",
+        "goal": "盲审材料准备",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "5f23ed71",
+            "date": "周一",
+            "task": "按盲审要求去除个人与导师信息",
+            "done": false
+          },
+          {
+            "id": "ad30d6b9",
+            "date": "周二",
+            "task": "整理评审书、原创声明等材料",
+            "done": false
+          },
+          {
+            "id": "4c652608",
+            "date": "周三",
+            "task": "完成最后一次全文校对",
+            "done": false
+          },
+          {
+            "id": "d09e6710",
+            "date": "周四",
+            "task": "检查格式细节与排版规范",
+            "done": false
+          },
+          {
+            "id": "155478a4",
+            "date": "周五",
+            "task": "准备盲审提交清单",
+            "done": false
+          },
+          {
+            "id": "089bd32a",
+            "date": "周六",
+            "task": "上午：匿名处理；下午：整理材料",
+            "done": false
+          },
+          {
+            "id": "e2de949d",
+            "date": "周日",
+            "task": "本周总结：盲审材料准备完成，下周目标：提交",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-03-w3",
+        "label": "第3周 (3/15-3/21)",
+        "goal": "提交盲审",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "3b46a293",
+            "date": "周一",
+            "task": "按规定时间提交盲审论文与材料",
+            "done": false
+          },
+          {
+            "id": "faca6ca1",
+            "date": "周二",
+            "task": "确认提交成功并保存回执",
+            "done": false
+          },
+          {
+            "id": "4e3fafdc",
+            "date": "周三",
+            "task": "同步梳理答辩核心素材",
+            "done": false
+          },
+          {
+            "id": "31645be1",
+            "date": "周四",
+            "task": "整理盲审期间可做的准备工作",
+            "done": false
+          },
+          {
+            "id": "4b2a1692",
+            "date": "周五",
+            "task": "备份所有提交材料",
+            "done": false
+          },
+          {
+            "id": "f02be75c",
+            "date": "周六",
+            "task": "上午：最终检查；下午：提交材料",
+            "done": false
+          },
+          {
+            "id": "5d705ca6",
+            "date": "周日",
+            "task": "本周总结：盲审提交完成，下周目标：答辩准备",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-03-w4",
+        "label": "第4周 (3/22-3/31)",
+        "goal": "答辩准备启动",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "e4695834",
+            "date": "周一",
+            "task": "搭建答辩PPT大纲",
+            "done": false
+          },
+          {
+            "id": "3546d1ea",
+            "date": "周二",
+            "task": "整理核心数据与典型案例",
+            "done": false
+          },
+          {
+            "id": "1aa9edd3",
+            "date": "周三",
+            "task": "积累往届答辩题目与问题库",
+            "done": false
+          },
+          {
+            "id": "f3c9afa2",
+            "date": "周四",
+            "task": "梳理论文创新点与核心结论",
+            "done": false
+          },
+          {
+            "id": "84083fcd",
+            "date": "周五",
+            "task": "准备答辩陈述初稿",
+            "done": false
+          },
+          {
+            "id": "fed93644",
+            "date": "周六",
+            "task": "上午：搭建PPT大纲；下午：整理素材",
+            "done": false
+          },
+          {
+            "id": "61fe1ee7",
+            "date": "周日",
+            "task": "🎉 3月成果：盲审提交完成，答辩准备启动",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2027-04",
+    "month": "2027年4月",
+    "goal": "盲审等待与答辩准备月",
+    "outcome": "✔ 答辩PPT、答辩逐字稿、完成2-3次模拟答辩",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2027-04-w1",
+        "label": "第1周 (4/1-4/7)",
+        "goal": "制作答辩PPT",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "a23f96b2",
+            "date": "周一",
+            "task": "完成答辩PPT制作，控制在20页左右",
+            "done": false
+          },
+          {
+            "id": "5286b5fc",
+            "date": "周二",
+            "task": "突出研究问题、核心方法、主要结论与创新点",
+            "done": false
+          },
+          {
+            "id": "7abaa88b",
+            "date": "周三",
+            "task": "逻辑清晰、图表简洁，避免大段文字堆砌",
+            "done": false
+          },
+          {
+            "id": "83829593",
+            "date": "周四",
+            "task": "设计PPT视觉风格，统一配色与字体",
+            "done": false
+          },
+          {
+            "id": "77919867",
+            "date": "周五",
+            "task": "检查PPT动画与播放效果",
+            "done": false
+          },
+          {
+            "id": "ef0da258",
+            "date": "周六",
+            "task": "上午：制作PPT；下午：优化视觉",
+            "done": false
+          },
+          {
+            "id": "3ac6659a",
+            "date": "周日",
+            "task": "本周总结：PPT制作完成，下周目标：逐字稿",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-04-w2",
+        "label": "第2周 (4/8-4/14)",
+        "goal": "撰写逐字稿",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "c1840a05",
+            "date": "周一",
+            "task": "撰写答辩陈述逐字稿，把控陈述时长",
+            "done": false
+          },
+          {
+            "id": "77f70c04",
+            "date": "周二",
+            "task": "整理预设问题清单，覆盖方法、创新点、不足等维度",
+            "done": false
+          },
+          {
+            "id": "6c7a68c5",
+            "date": "周三",
+            "task": "形成应答文档，准备标准回答",
+            "done": false
+          },
+          {
+            "id": "a288aae4",
+            "date": "周四",
+            "task": "检查逐字稿与PPT内容的对应关系",
+            "done": false
+          },
+          {
+            "id": "cf26af66",
+            "date": "周五",
+            "task": "优化陈述语言，增强表达自信",
+            "done": false
+          },
+          {
+            "id": "d00cf4a9",
+            "date": "周六",
+            "task": "上午：撰写逐字稿；下午：整理问题清单",
+            "done": false
+          },
+          {
+            "id": "8c459de8",
+            "date": "周日",
+            "task": "本周总结：逐字稿完成，下周目标：模拟答辩",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-04-w3",
+        "label": "第3周 (4/15-4/21)",
+        "goal": "模拟答辩",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "48cf5bbb",
+            "date": "周一",
+            "task": "完成2-3次完整模拟答辩",
+            "done": false
+          },
+          {
+            "id": "d46600d8",
+            "date": "周二",
+            "task": "优化陈述节奏与回答逻辑",
+            "done": false
+          },
+          {
+            "id": "b86cb4e4",
+            "date": "周三",
+            "task": "针对薄弱环节补充准备",
+            "done": false
+          },
+          {
+            "id": "d96bb253",
+            "date": "周四",
+            "task": "记录模拟中发现的问题",
+            "done": false
+          },
+          {
+            "id": "2e1d26e9",
+            "date": "周五",
+            "task": "调整PPT与逐字稿",
+            "done": false
+          },
+          {
+            "id": "73bf1e35",
+            "date": "周六",
+            "task": "上午：模拟答辩；下午：复盘改进",
+            "done": false
+          },
+          {
+            "id": "f4467cd1",
+            "date": "周日",
+            "task": "本周总结：模拟答辩完成，下周目标：盲审反馈",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-04-w4",
+        "label": "第4周 (4/22-4/30)",
+        "goal": "盲审反馈与微调",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "6d7f3b30",
+            "date": "周一",
+            "task": "接收盲审结果与评审意见",
+            "done": false
+          },
+          {
+            "id": "711d8793",
+            "date": "周二",
+            "task": "逐条梳理并做小幅修改",
+            "done": false
+          },
+          {
+            "id": "756a7f33",
+            "date": "周三",
+            "task": "准备答辩时对评审意见的回应说明",
+            "done": false
+          },
+          {
+            "id": "903b628e",
+            "date": "周四",
+            "task": "完善答辩材料，做最终检查",
+            "done": false
+          },
+          {
+            "id": "3196b6e2",
+            "date": "周五",
+            "task": "调整状态，准备正式答辩",
+            "done": false
+          },
+          {
+            "id": "2ab9fae2",
+            "date": "周六",
+            "task": "上午：处理盲审意见；下午：完善材料",
+            "done": false
+          },
+          {
+            "id": "ee72c024",
+            "date": "周日",
+            "task": "🎉 4月成果：盲审反馈处理完毕，答辩准备就绪",
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2027-05",
+    "month": "2027年5月",
+    "goal": "正式答辩与最终定稿月",
+    "outcome": "✔ 通过毕业论文答辩、最终归档版论文",
+    "expanded": false,
+    "weeks": [
+      {
+        "id": "2027-05-w1",
+        "label": "第1周 (5/1-5/7)",
+        "goal": "答辩前冲刺",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "fe277f1b",
+            "date": "周一",
+            "task": "再次熟悉答辩内容，练习脱稿陈述",
+            "done": false
+          },
+          {
+            "id": "21886b1e",
+            "date": "周二",
+            "task": "复盘所有预设问题，巩固回答思路",
+            "done": false
+          },
+          {
+            "id": "422ad413",
+            "date": "周三",
+            "task": "调整状态，准备正式答辩",
+            "done": false
+          },
+          {
+            "id": "1332d03c",
+            "date": "周四",
+            "task": "检查答辩材料完整性",
+            "done": false
+          },
+          {
+            "id": "3c0e3f4b",
+            "date": "周五",
+            "task": "确认答辩时间与地点",
+            "done": false
+          },
+          {
+            "id": "e11ca446",
+            "date": "周六",
+            "task": "上午：脱稿练习；下午：状态调整",
+            "done": false
+          },
+          {
+            "id": "e86291be",
+            "date": "周日",
+            "task": "本周总结：答辩前准备完成，下周目标：正式答辩",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-05-w2",
+        "label": "第2周 (5/8-5/14)",
+        "goal": "正式答辩",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "069c9850",
+            "date": "周一",
+            "task": "参加毕业论文正式答辩",
+            "done": false
+          },
+          {
+            "id": "01dac7f6",
+            "date": "周二",
+            "task": "完整陈述研究内容",
+            "done": false
+          },
+          {
+            "id": "d5c473b5",
+            "date": "周三",
+            "task": "认真回答评委问题",
+            "done": false
+          },
+          {
+            "id": "b014451b",
+            "date": "周四",
+            "task": "记录答辩委员会修改意见",
+            "done": false
+          },
+          {
+            "id": "861db3ba",
+            "date": "周五",
+            "task": "感谢评委并与导师沟通后续",
+            "done": false
+          },
+          {
+            "id": "9f5c53fd",
+            "date": "周六",
+            "task": "上午：答辩准备；下午：正式答辩",
+            "done": false
+          },
+          {
+            "id": "c8bb41b9",
+            "date": "周日",
+            "task": "本周总结：答辩完成，下周目标：最终修改",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-05-w3",
+        "label": "第3周 (5/15-5/21)",
+        "goal": "最终修改",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "48eb1401",
+            "date": "周一",
+            "task": "根据答辩意见完成论文最终修改",
+            "done": false
+          },
+          {
+            "id": "84ba3adc",
+            "date": "周二",
+            "task": "提交导师审核确认",
+            "done": false
+          },
+          {
+            "id": "005b1014",
+            "date": "周三",
+            "task": "形成归档版终稿",
+            "done": false
+          },
+          {
+            "id": "8db1560e",
+            "date": "周四",
+            "task": "整理修改记录与说明",
+            "done": false
+          },
+          {
+            "id": "e4e15c04",
+            "date": "周五",
+            "task": "备份最终版论文",
+            "done": false
+          },
+          {
+            "id": "89f25f23",
+            "date": "周六",
+            "task": "上午：修改论文；下午：提交确认",
+            "done": false
+          },
+          {
+            "id": "1606c8e5",
+            "date": "周日",
+            "task": "本周总结：最终修改完成，下周目标：归档提交",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2027-05-w4",
+        "label": "第4周 (5/22-5/31)",
+        "goal": "归档收尾",
+        "expanded": false,
+        "done": false,
+        "days": [
+          {
+            "id": "411824b5",
+            "date": "周一",
+            "task": "按学院要求整理全部毕业材料",
+            "done": false
+          },
+          {
+            "id": "d62ad7fb",
+            "date": "周二",
+            "task": "提交最终版论文电子版与纸质版",
+            "done": false
+          },
+          {
+            "id": "aba448c5",
+            "date": "周三",
+            "task": "完成全部论文流程",
+            "done": false
+          },
+          {
+            "id": "e23e2886",
+            "date": "周四",
+            "task": "整理研究资料归档",
+            "done": false
+          },
+          {
+            "id": "13e5ce7a",
+            "date": "周五",
+            "task": "备份所有重要文件",
+            "done": false
+          },
+          {
+            "id": "bed0ba0a",
+            "date": "周六",
+            "task": "上午：整理材料；下午：提交归档",
+            "done": false
+          },
+          {
+            "id": "f6710093",
+            "date": "周日",
+            "task": "🎉 5月成果：顺利毕业！",
+            "done": false
+          }
+        ]
+      }
+    ]
+  }
+];
+}
+
+
+/* ========== Utils ========== */
+function $(s){ return document.querySelector(s); }
+function $$(s){ return document.querySelectorAll(s); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function toast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.remove(); }, 2000);
+}
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function editableText(val){
+  return `<span class="editable" contenteditable="true">${escapeHtml(val||'')}</span>`;
+}
+function attachEditable(selector, dataPath, index, field){
+  document.querySelectorAll(selector+' .editable').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      let arr = dataPath.split('.');
+      let obj = store;
+      for(let i=0;i<arr.length-1;i++) obj = obj[arr[i]];
+      obj[arr[arr.length-1]][index][field] = el.textContent.trim();
+      saveStore();
+    });
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } });
+  });
+}
+
+/* ========== Navigation ========== */
+const pageTitles = {
+  home:{emoji:'🏠',title:'首页'},
+  plan:{emoji:'📅',title:'每日计划'},
+  thesis:{emoji:'📖',title:'论文进度'},
+  job:{emoji:'💼',title:'求职备考'},
+  checkin:{emoji:'🏃',title:'自律打卡'},
+  diet:{emoji:'🍱',title:'饮食热量管理'},
+  finance:{emoji:'💰',title:'收支记账本'},
+  review:{emoji:'📝',title:'每日复盘'},
+  settings:{emoji:'⚙️',title:'我的设置'}
+};
+
+let currentPage = 'home';
+
+function renderNav(){
+  const navList = $('#navList');
+  navList.innerHTML = '';
+  const bottomnav = $('#bottomnav');
+  bottomnav.innerHTML = '';
+  store.navOrder.forEach((item, i)=>{
+    // Sidebar
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (currentPage===item.id?' active':'');
+    div.dataset.page = item.id;
+    div.innerHTML = `
+      <span class="emoji">${item.emoji}</span>
+      <span class="nav-label">${item.name}</span>
+      <span class="reorder-btns">
+        <button onclick="reorderNav(${i},-1)" ${i===0?'disabled':''}>▲</button>
+        <button onclick="reorderNav(${i},1)" ${i===store.navOrder.length-1?'disabled':''}>▼</button>
+      </span>`;
+    div.addEventListener('click', ()=> navigateTo(item.id));
+    navList.appendChild(div);
+    // Bottom nav
+    const bn = document.createElement('div');
+    bn.className = 'bnav-item' + (currentPage===item.id?' active':'');
+    bn.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+    bn.addEventListener('click', ()=> navigateTo(item.id));
+    bottomnav.appendChild(bn);
+  });
+}
+
+function reorderNav(index, dir){
+  const newIndex = index + dir;
+  if(newIndex<0 || newIndex>=store.navOrder.length) return;
+  const arr = store.navOrder;
+  [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+  saveStore();
+  renderNav();
+  renderNavCustom();
+}
+
+function navigateTo(pageId){
+  currentPage = pageId;
+  $$('.page').forEach(p=> p.classList.remove('active'));
+  let page = $('#page-'+pageId);
+  if(!page && pageId.startsWith('custom_')){
+    page = $('#page-custom-template');
+    if(page) page.id = 'page-'+pageId;
+  }
+  if(page) page.classList.add('active');
+  const info = pageTitles[pageId] || {emoji:'📄',title:pageId};
+  $('#topbarEmoji').textContent = info.emoji;
+  $('#topbarTitle').textContent = info.title;
+  renderNav();
+  // Render page content
+  switch(pageId){
+    case 'home': renderHome(); break;
+    case 'plan': renderPlans(); break;
+    case 'thesis': renderThesis(); break;
+    case 'job': renderJob(); break;
+    case 'checkin': renderCheckin(); break;
+    case 'diet': renderDiet(); break;
+    case 'finance': renderFinance(); break;
+    case 'review': renderReview(); break;
+    case 'settings': renderSettings(); break;
+    default:
+      if(pageId.startsWith('custom_')) renderCustomPage(pageId);
+      break;
+  }
+  // Close mobile sidebar
+  $('#sidebar').classList.remove('show');
+  const overlay = $('#navOverlay');
+  if(overlay) overlay.classList.remove('show');
+  window.scrollTo(0,0);
+}
+
+/* ========== Home Page ========== */
+const quotes = [
+  '每天进步一点点，就是了不起的蜕变 🌸',
+  '论文再难，也要温柔地对待自己呀 💪',
+  '求职路上，每一步都算数，每一份努力都不会白费 ✨',
+  '今天的自律，是明天的自由 🌟',
+  '慢慢来，比较快。稳扎稳打最重要 🐢',
+  '你比你想象的更强大，更勇敢 💖',
+  '研三再苦，也要好好吃饭好好睡觉呀 🍱',
+  '每一次复盘，都是送给自己最好的礼物 📝',
+  '坚持打卡的你，真的很棒！👏',
+  '上岸不是终点，成长才是 🌈',
+  '焦虑的时候，先做一件小事就好 📝',
+  '今天也是元气满满的一天！加油呀 ☀️',
+  '你的努力，时间都看得见 ⏰',
+  '不要和别人比进度，按照自己的节奏来 🎵',
+  '即使走得慢，只要不后退就好 🌱'
+];
+
+function renderHome(){
+  const now = new Date();
+  const hour = now.getHours();
+  let greet = '你好呀';
+  if(hour<6) greet='夜深了，早点休息哦';
+  else if(hour<12) greet='早上好';
+  else if(hour<14) greet='中午好';
+  else if(hour<18) greet='下午好';
+  else greet='晚上好';
+  const monthDay = `${now.getMonth()+1}月${now.getDate()}日`;
+  const weekDays = ['日','一','二','三','四','五','六'];
+  $('#greeting').textContent = `${greet}！今天是${monthDay} 星期${weekDays[now.getDay()]} 🌸`;
+  $('#greeting').onblur = ()=>{
+    const txt = $('#greeting').textContent.trim();
+    if(!store.homeLabels) store.homeLabels = {};
+    store.homeLabels.greeting = txt;
+    saveStore();
+  };
+  if(!store.homeLabels) store.homeLabels = {};
+  if(store.homeLabels.greeting) $('#greeting').textContent = store.homeLabels.greeting;
+  const qi = (now.getMonth()*31 + now.getDate()) % quotes.length;
+  if(!store.homeLabels) store.homeLabels = {};
+  if(store.homeLabels.quote){
+    $('#dailyQuote').textContent = store.homeLabels.quote;
+  } else {
+    $('#dailyQuote').textContent = quotes[qi];
+  }
+  $('#dailyQuote').onblur = ()=>{
+    const txt = $('#dailyQuote').textContent.trim();
+    if(!store.homeLabels) store.homeLabels = {};
+    store.homeLabels.quote = txt;
+    saveStore();
+  };
+
+  // Quick cards
+  const quickCards = $('#quickCards');
+  quickCards.innerHTML = '';
+  const quickItems = [
+    {page:'plan',emoji:'📅',label:'每日计划'},
+    {page:'thesis',emoji:'📖',label:'论文进度'},
+    {page:'job',emoji:'💼',label:'求职备考'},
+    {page:'checkin',emoji:'🏃',label:'运动打卡'},
+    {page:'diet',emoji:'🍱',label:'饮食热量'},
+    {page:'finance',emoji:'💰',label:'收支记账'},
+    {page:'review',emoji:'📝',label:'每日复盘'},
+    {page:'settings',emoji:'⚙️',label:'设置'}
+  ];
+  quickItems.forEach(item=>{
+    const c = document.createElement('div');
+    c.className='quick-card';
+    c.innerHTML = `<span class="emoji">${item.emoji}</span><span class="label">${item.label}</span>`;
+    c.addEventListener('click',()=> navigateTo(item.page));
+    quickCards.appendChild(c);
+  });
+
+  // Overview stats
+  renderOverview();
+}
+
+function renderOverview(){
+  const stats = $('#overviewStats');
+  // Thesis - from new thesisPlan
+  let thesisTotal=0, thesisDone=0, thesisRemaining=0;
+  (store.thesisPlan||[]).forEach(m=>{ m.weeks.forEach(w=>{ w.days.forEach(d=>{ thesisTotal++; if(d.done) thesisDone++; else thesisRemaining++; }); }); });
+  const thesisProgress = thesisTotal>0 ? Math.round(thesisDone/thesisTotal*100) : 0;
+  // Job
+  const allApps = [].concat(...Object.values(store.jobTracks).map(t=>t.applications||[]));
+  const weekAgo = new Date(Date.now()-7*86400000);
+  const weekApps = allApps.filter(a=> new Date(a.date)>=weekAgo).length;
+  // Checkin
+  const exDates = Object.keys(store.exerciseLog).sort();
+  let exStreak = 0;
+  for(let d=new Date(); ; d.setDate(d.getDate()-1)){
+    const dk = d.toISOString().slice(0,10);
+    if(store.exerciseLog[dk]) exStreak++;
+    else break;
+  }
+  const enDates = Object.keys(store.englishLog).sort();
+  let enStreak = 0;
+  for(let d=new Date(); ; d.setDate(d.getDate()-1)){
+    const dk = d.toISOString().slice(0,10);
+    if(store.englishLog[dk]) enStreak++;
+    else break;
+  }
+  const weekEx = Object.keys(store.exerciseLog).filter(d=> new Date(d)>=weekAgo).length;
+  const weekEn = Object.keys(store.englishLog).filter(d=> new Date(d)>=weekAgo).length;
+  const exRate = Math.round(weekEx/7*100);
+  const enRate = Math.round(weekEn/7*100);
+  // Diet
+  const todayD = todayKey();
+  const todayMeals = store.dietLog[todayD] || {};
+  let todayCal = 0;
+  Object.values(todayMeals).forEach(meal=>{ (meal||[]).forEach(f=> todayCal += (parseInt(f.cal)||0)); });
+  const tdee = calcTDEE();
+  const calDiff = tdee - todayCal;
+
+  stats.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${thesisProgress}%</div>
+      <div class="stat-label">📖 论文本周进度</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">剩余${thesisRemaining}个日任务</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${weekApps}</div>
+      <div class="stat-label">💼 本周投递岗位</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">累计${allApps.length}个</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${exStreak}</div>
+      <div class="stat-label">🏃 连续打卡天数</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">运动${exRate}% / 英语${enRate}%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value ${calDiff>=0?'cal-ok':'cal-over'}">${todayCal}</div>
+      <div class="stat-label">🍱 今日摄入(kcal)</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">${calDiff>=0?'还可摄入'+calDiff:'已超标'+(-calDiff)}</div>
+    </div>`;
+}
+
+/* ========== Fireworks ========== */
+function fireworks(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    toast('🌸 打卡成功！今天也是棒棒的一天～');
+    return;
+  }
+  const colors = ['#ff5b8d','#ff8fab','#ffd6e0','#ffc107','#ff69b4','#ffb6c1'];
+  for(let i=0;i<30;i++){
+    const fw = document.createElement('div');
+    fw.className='firework';
+    fw.style.cssText = `left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:${colors[i%colors.length]};position:fixed`;
+    document.body.appendChild(fw);
+    const angle = (Math.PI*2*i)/30;
+    const dist = 100+Math.random()*100;
+    fw.animate([
+      {transform:'translate(-50%,-50%) scale(1)',opacity:1},
+      {transform:`translate(${Math.cos(angle)*dist-50}%,${Math.sin(angle)*dist-50}%) scale(0)`,opacity:0}
+    ],{duration:800+Math.random()*400,easing:'cubic-bezier(.1,.8,.3,1)'}).onfinish=()=> fw.remove();
+  }
+  toast('🌸 打卡成功！今天也是棒棒的一天～');
+}
+
+/* ========== Daily Plan ========== */
+function renderPlans(){
+  const cats = {thesis:'📖 论文', job:'💼 求职', sport:'🏃 运动', english:'📚 英语'};
+  const catColors = {thesis:'badge-pink', job:'badge-green', sport:'badge-blue', english:'badge-purple'};
+
+  // Group plans by category
+  const groups = {thesis:[], job:[], sport:[], english:[]};
+  store.plans.forEach((p,i)=>{ groups[p.category||'thesis'].push({...p, _i:i}); });
+
+  const list = $('#planList');
+  list.innerHTML = '';
+  let doneAll=0, totalAll=0;
+
+  Object.keys(groups).forEach(cat=>{
+    const items = groups[cat];
+    if(items.length===0) return;
+    totalAll += items.length;
+    const done = items.filter(p=>p.done).length;
+    doneAll += done;
+
+    const catDiv = document.createElement('div');
+    catDiv.style.cssText = 'margin-bottom:14px';
+    catDiv.innerHTML = `<div style="font-weight:600;font-size:.85rem;color:var(--text-light);margin-bottom:6px;display:flex;align-items:center;gap:6px">
+      <span>${cats[cat]}</span>
+      <span class="badge ${catColors[cat]}">${done}/${items.length}</span>
+    </div>`;
+
+    items.forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'task-item' + (p.done?' done':'');
+      div.innerHTML = `
+        <input type="checkbox" ${p.done?'checked':''} onchange="togglePlan(${p._i})">
+        <span class="task-text" contenteditable onblur="editPlanText(${p._i},this.textContent)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escapeHtml(p.text)}</span>
+        <button class="delete-btn" onclick="deletePlan(${p._i})">🗑️</button>`;
+      catDiv.appendChild(div);
+    });
+    list.appendChild(catDiv);
+  });
+
+  if(totalAll===0){
+    list.innerHTML = '<div class="empty-hint">还没有待办任务，添加一个开始吧～</div>';
+  }
+  $('#planSummary').textContent = `已完成 ${doneAll}/${totalAll} ${totalAll>0?`（${Math.round(doneAll/totalAll*100)}%）`:''}`;
+
+  // Routines
+  const rList = $('#routineList');
+  rList.innerHTML = '';
+  if(store.routines.length===0){
+    rList.innerHTML = '<div class="empty-hint">添加固定任务，养成好习惯～</div>';
+  }
+  store.routines.forEach((r,i)=>{
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.innerHTML = `
+      <span class="emoji">${r.cycle==='daily'?'🔁':'📆'}</span>
+      <span class="task-text" contenteditable onblur="editRoutineText(${i},this.textContent)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escapeHtml(r.text)}</span>
+      <span class="badge badge-pink">${r.cycle==='daily'?'每日':'每周'}</span>
+      <button class="delete-btn" onclick="deleteRoutine(${i})">🗑️</button>`;
+    rList.appendChild(div);
+  });
+}
+
+function togglePlan(i){
+  store.plans[i].done = !store.plans[i].done;
+  saveStore(); renderPlans();
+}
+function deletePlan(i){
+  store.plans.splice(i,1); saveStore(); renderPlans();
+}
+function deleteRoutine(i){
+  store.routines.splice(i,1); saveStore(); renderPlans();
+}
+
+/* ========== Thesis ========== */
+function renderThesis(){
+  const plan = store.thesisPlan;
+
+  // Overall progress calculation
+  let totalDays=0, doneDays=0;
+  plan.forEach(m=>{ m.weeks.forEach(w=>{ w.days.forEach(d=>{ totalDays++; if(d.done) doneDays++; }); }); });
+  const progress = totalDays>0 ? Math.round(doneDays/totalDays*100) : 0;
+  $('#thesisOverall').style.width = progress+'%';
+  $('#thesisOverallText').textContent = progress+'% ('+doneDays+'/'+totalDays+'个日任务完成)';
+
+  // Build month list
+  const list = $('#thesisMonthList');
+  list.innerHTML = '';
+
+  plan.forEach((month,mi)=>{
+    // Calculate month progress
+    let mTotal=0, mDone=0;
+    month.weeks.forEach(w=>{ w.days.forEach(d=>{ mTotal++; if(d.done) mDone++; }); });
+    const mProgress = mTotal>0 ? Math.round(mDone/mTotal*100) : 0;
+
+    // Count done weeks for auto-check
+    let doneWeeks = 0;
+    month.weeks.forEach(w=>{
+      const wd = w.days.filter(d=>d.done).length;
+      w.done = w.days.length>0 && wd===w.days.length;
+      if(w.done) doneWeeks++;
+    });
+    const allWeeksDone = month.weeks.length>0 && doneWeeks===month.weeks.length;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = 'cursor:pointer;transition:all .2s';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap" onclick="toggleMonth('${month.id}')">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+          <span style="font-size:1.5rem">${month.expanded?'📂':'📁'}</span>
+          <div style="min-width:0">
+            <div style="font-weight:700;font-size:1rem" class="editable-text" contenteditable data-thesis-path="month-title" data-mi="${mi}" data-field="month" onclick="event.stopPropagation()">${month.month}</div>
+            <div style="font-size:.82rem;color:var(--text-light)"><span class="editable-text" contenteditable data-thesis-path="month" data-mi="${mi}" data-field="goal" onclick="event.stopPropagation()">${month.goal}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${allWeeksDone?'<span class="badge badge-green">✅ 全部完成</span>':
+            mDone>0?`<span class="badge badge-pink">${mDone}/${mTotal}</span>`:
+            '<span class="badge badge-gray">待开始</span>'}
+          <div style="width:80px"><div class="progress-bar" style="margin:0"><div class="progress-fill" style="width:${mProgress}%"></div></div></div>
+          <span style="font-size:.8rem;color:var(--pink);font-weight:700">${mProgress}%</span>
+        </div>
+      </div>`;
+
+    if(month.expanded){
+      // Show weeks
+      month.weeks.forEach((week,wi)=>{
+        const wTotal = week.days.length;
+        const wDone = week.days.filter(d=>d.done).length;
+        const wProgress = wTotal>0 ? Math.round(wDone/wTotal*100) : 0;
+        // Auto-check week
+        week.done = wTotal>0 && wDone===wTotal;
+
+        const wDiv = document.createElement('div');
+        wDiv.style.cssText = 'margin:8px 0 8px 24px;padding:12px 16px;background:var(--input-bg);border-radius:10px;transition:all .2s';
+        wDiv.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;cursor:pointer" onclick="toggleWeek('${month.id}','${week.id}')">
+            <div style="display:flex;align-items:center;gap:6px;min-width:0">
+              <span style="font-size:1.1rem">${week.expanded?'📋':'📎'}</span>
+              <span style="font-weight:600;font-size:.9rem" class="editable-text" contenteditable data-thesis-path="week" data-mi="${mi}" data-wi="${wi}" data-field="label" onclick="event.stopPropagation()">${week.label}</span>
+              <span style="font-size:.8rem;color:var(--text-light)" class="editable-text" contenteditable data-thesis-path="week" data-mi="${mi}" data-wi="${wi}" data-field="goal" onclick="event.stopPropagation()">${week.goal}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              ${week.done?'<span class="badge badge-green">✅ 本周完成</span>':
+                wDone>0?`<span class="badge badge-pink">${wDone}/${wTotal}</span>`:
+                '<span class="badge badge-gray">待完成</span>'}
+            </div>
+          </div>`;
+
+        if(week.expanded){
+          // Show daily tasks
+          week.days.forEach((day,di)=>{
+            const dDiv = document.createElement('div');
+            dDiv.style.cssText = 'margin:4px 0 4px 16px;padding:8px 12px;display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:8px;transition:all .2s';
+            if(day.done) dDiv.style.opacity = '0.5';
+            dDiv.innerHTML = `
+              <input type="checkbox" ${day.done?'checked':''} style="margin-top:3px;flex-shrink:0" onchange="toggleThesisDay('${month.id}','${week.id}','${day.id}')">
+              <div style="flex:1;min-width:0">
+                <span style="font-weight:600;font-size:.82rem" class="editable-text" contenteditable data-thesis-path="day-date" data-mi="${mi}" data-wi="${wi}" data-di="${di}" onclick="event.stopPropagation()">${day.date}</span>
+                <div style="font-size:.8rem;color:${day.done?'var(--text-light)':'var(--text)'};white-space:pre-wrap;${day.done?'text-decoration:line-through;':''}" class="editable-text" contenteditable data-thesis-path="day" data-mi="${mi}" data-wi="${wi}" data-di="${di}" data-field="task" onclick="event.stopPropagation()">${escapeHtml(day.task)}</div>
+              </div>`;
+            wDiv.appendChild(dDiv);
+          });
+        }
+        card.appendChild(wDiv);
+      });
+
+      // Month outcome
+      if(month.outcome || month.expanded){
+        const outDiv = document.createElement('div');
+        outDiv.style.cssText = 'margin:10px 0 4px 24px;padding:10px 14px;background:var(--pink-light);border-radius:8px;font-size:.82rem;color:var(--pink-dark);font-weight:600';
+        outDiv.innerHTML = '<span class="editable-text" contenteditable data-thesis-path="month-outcome" data-mi="${mi}" onclick="event.stopPropagation()">' + escapeHtml(month.outcome || '') + '</span>';
+        card.appendChild(outDiv);
+      }
+    }
+
+    list.appendChild(card);
+  });
+
+  // Attach editable blur handlers
+  list.querySelectorAll('.editable-text[contenteditable]').forEach(el=>{
+    el.onblur = ()=>{
+      const path = el.dataset.thesisPath;
+      const mi = parseInt(el.dataset.mi);
+      const wi = el.dataset.wi!==undefined ? parseInt(el.dataset.wi) : null;
+      const di = el.dataset.di!==undefined ? parseInt(el.dataset.di) : null;
+      const field = el.dataset.field;
+      const val = el.textContent.trim();
+      if(path==='month-title' || (path==='month' && field==='goal')){
+        if(field==='month') store.thesisPlan[mi].month = val;
+        else if(field==='goal') store.thesisPlan[mi].goal = val;
+      } else if(path==='week'){
+        if(field==='label') store.thesisPlan[mi].weeks[wi].label = val;
+        else if(field==='goal') store.thesisPlan[mi].weeks[wi].goal = val;
+      } else if(path==='day'){
+        store.thesisPlan[mi].weeks[wi].days[di].task = val;
+      } else if(path==='day-date'){
+        store.thesisPlan[mi].weeks[wi].days[di].date = val;
+      } else if(path==='month-outcome'){
+        store.thesisPlan[mi].outcome = val;
+      }
+      saveStore();
+    };
+    el.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } };
+  });
+
+    // File links
+  const fList = $('#fileLinkList');
+  fList.innerHTML = '';
+  if(store.fileLinks.length===0) fList.innerHTML = '<div class="empty-hint">暂无文件链接</div>';
+  store.fileLinks.forEach((f,i)=>{
+    const div = document.createElement('div');
+    div.className='note-card';
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">📎 ${escapeHtml(f.name)}</a>
+      <button class="delete-btn" onclick="store.fileLinks.splice(${i},1);saveStore();renderThesis()">🗑️</button></div>`;
+    fList.appendChild(div);
+  });
+
+  // Memos
+  const mList = $('#memoList');
+  mList.innerHTML = '';
+  if(store.memos.length===0) mList.innerHTML = '<div class="empty-hint">暂无难点备忘</div>';
+  store.memos.forEach((m,i)=>{
+    const div = document.createElement('div');
+    div.className='note-card';
+    div.innerHTML = `<div class="note-content">${escapeHtml(m)}</div>
+      <div class="note-actions"><button class="btn btn-sm" onclick="navigator.clipboard.writeText('${escapeHtml(m).replace(/'/g,"\\'")}');toast('已复制')">📋 复制</button>
+      <button class="delete-btn" onclick="store.memos.splice(${i},1);saveStore();renderThesis()">🗑️ 删除</button></div>`;
+    mList.appendChild(div);
+  });
+}
+
+function toggleMonth(mid){
+  const month = store.thesisPlan.find(m=>m.id===mid);
+  if(month){ month.expanded = !month.expanded; saveStore(); renderThesis(); }
+}
+function toggleWeek(mid,wid){
+  const month = store.thesisPlan.find(m=>m.id===mid);
+  if(month){
+    const week = month.weeks.find(w=>w.id===wid);
+    if(week){ week.expanded = !week.expanded; saveStore(); renderThesis(); }
+  }
+}
+function toggleThesisDay(mid,wid,did){
+  const month = store.thesisPlan.find(m=>m.id===mid);
+  if(month){
+    const week = month.weeks.find(w=>w.id===wid);
+    if(week){
+      const day = week.days.find(d=>d.id===did);
+      if(day){
+        day.done = !day.done;
+        // Auto-check week
+        const allDone = week.days.every(d=>d.done);
+        week.done = allDone;
+        saveStore();
+        renderThesis();
+        if(allDone) toast('🎉 本周所有日任务全部完成！周任务自动勾选 ✅');
+      }
+    }
+  }
+}
+
+/* ========== Custom Page ========== */
+function renderCustomPage(pageId){
+  const navItem = store.navOrder.find(n => n.id === pageId);
+  $('#customPageTitle').textContent = (navItem ? navItem.emoji + ' ' + navItem.label : '📄 自定义页面');
+
+  if(!store.customPages) store.customPages = {};
+  if(!store.customPages[pageId]) store.customPages[pageId] = [];
+  const items = store.customPages[pageId];
+
+  const contentDiv = $('#customPageContent');
+  contentDiv.innerHTML = '';
+
+  if(items.length === 0){
+    contentDiv.innerHTML = '<div class="empty-hint">点击下方「添加分级内容」开始编辑</div>';
+  }
+
+  items.forEach((item, idx) => {
+    const div = document.createElement('div');
+    let style = '';
+    if(item.level === '1'){
+      style = 'font-size:1.1rem;font-weight:700;background:var(--pink-light);padding:10px 14px;border-radius:10px;margin:8px 0;color:var(--pink-dark);';
+    } else if(item.level === '2'){
+      style = 'font-size:.95rem;font-weight:600;padding:6px 0 6px 16px;margin:4px 0;border-left:3px solid var(--pink);color:var(--text);';
+    } else {
+      style = 'font-size:.85rem;padding:4px 0 4px 32px;margin:2px 0;color:var(--text-light);line-height:1.6;';
+    }
+    div.style.cssText = style + 'cursor:text;';
+    div.innerHTML = `<span class="editable-text" contenteditable data-custom-idx="${idx}" onclick="event.stopPropagation()">${escapeHtml(item.text || '')}</span>
+      <button class="delete-btn" style="margin-left:8px;font-size:.7rem" onclick="deleteCustomItem('${pageId}',${idx})">🗑️</button>`;
+    contentDiv.appendChild(div);
+  });
+
+  // Attach editable handlers
+  contentDiv.querySelectorAll('.editable-text[contenteditable]').forEach(el => {
+    el.onblur = () => {
+      const idx = parseInt(el.dataset.customIdx);
+      store.customPages[pageId][idx].text = el.textContent.trim();
+      saveStore();
+    };
+    el.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); el.blur(); } };
+  });
+}
+
+function deleteCustomItem(pageId, idx){
+  if(!store.customPages || !store.customPages[pageId]) return;
+  store.customPages[pageId].splice(idx, 1);
+  saveStore();
+  renderCustomPage(pageId);
+}
+
+/* ========== Job Prep ========== */
+const jobTrackDefs = [
+  {id:'gov', name:'央国企/行政岗', emoji:'🏛️'},
+  {id:'corp', name:'外企私企', emoji:'🏢'},
+  {id:'uniAdmin', name:'高校行政/辅导员', emoji:'🎓'},
+  {id:'uniTeacher', name:'高校专任教师', emoji:'👩‍🏫'}
+];
+let currentJobTrack = 'gov';
+const jobSubModules = ['投递记录','面试准备库','刷题进度'];
+let currentJobSub = '投递记录';
+
+const studyCategories = ['资料分析','判断推理','言语理解','数量关系','政治常识','常识判断','教育综合知识','其他'];
+
+let currentJobTab = 'study';
+function switchJobTab(tab){
+  currentJobTab = tab;
+  document.querySelectorAll('#jobTabBar button').forEach(b=>{
+    b.className = b.dataset.tab===tab?'active':'';
+  });
+  renderJob();
+}
+
+function renderJob(){
+  const content = $('#jobTabContent');
+
+  // Update top stats
+  const allApps = [];
+  ['gov','corp','uniAdmin','uniTeacher'].forEach(t=>{
+    (store.jobTracks[t]?.applications||[]).forEach(a=>allApps.push(a));
+  });
+  const totalApps = allApps.length;
+  const todoApps = allApps.filter(a=>['待笔试','待面试','进入终面'].includes(a.status)).length;
+  const thisMonth = allApps.filter(a=>a.date && a.date.startsWith(todayKey().slice(0,7))).length;
+
+  // Study stats
+  let totalQ=0, doneQ=0;
+  const sp = store.jobStudyProgress || {};
+  Object.values(sp).forEach(m=>{ totalQ+=parseInt(m.total)||0; doneQ+=parseInt(m.done)||0; });
+
+  $('#jobStatQuestions').textContent = doneQ;
+  $('#jobStatApps').textContent = totalApps;
+  $('#jobStatTodo').textContent = todoApps;
+  $('#jobStatNew').textContent = thisMonth;
+
+  let html = '';
+
+  if(currentJobTab==='study'){
+    // ===== Tab1: 笔试刷题进度 =====
+    const subjects = [
+      {id:'xingce', name:'📊 行测', modules:['资料分析','判断推理','言语理解','数量关系','政治常识','常识判断']},
+      {id:'shenlun', name:'📝 申论', modules:['小题训练','大作文']},
+      {id:'jiaozong', name:'🧑‍🏫 教综', modules:['教育学','心理学','教育法规']},
+      {id:'other', name:'📌 其他', modules:['专业知识','企业文化']}
+    ];
+    html += '<div class="card"><div class="card-title">📚 笔试刷题进度</div>';
+    subjects.forEach(sub=>{
+      html += `<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="padding:12px 14px;background:var(--pink-light);font-weight:700;cursor:pointer" onclick="toggleStudySub('${sub.id}')">${sub.name}</div>`;
+      if((store.jobStudyExpand||{})[sub.id]){
+        html += '<div style="padding:10px 14px">';
+        sub.modules.forEach(mod=>{
+          const msp = sp[mod] || {total:0,done:0,correct:0};
+          const rate = msp.total>0 ? Math.round(msp.done/msp.total*100) : 0;
+          const acc = msp.done>0 ? Math.round(msp.correct/msp.done*100) : 0;
+          html += `<div style="margin-bottom:10px;padding:10px;background:var(--input-bg);border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-weight:600;font-size:.85rem">${mod}</span>
+              <span style="font-size:.75rem;color:var(--text-light)">${msp.done}/${msp.total}题 · 正确率${acc}%</span>
+            </div>
+            <div class="progress-bar" style="margin-bottom:6px"><div class="progress-fill" style="width:${rate}%"></div></div>
+            <div class="row" style="gap:6px">
+              <div style="flex:1"><input type="number" placeholder="总题量" value="${msp.total||''}" style="width:100%;font-size:.78rem;padding:5px" onchange="updateJobStudy('${mod}','total',this.value)"></div>
+              <div style="flex:1"><input type="number" placeholder="已完成" value="${msp.done||''}" style="width:100%;font-size:.78rem;padding:5px" onchange="updateJobStudy('${mod}','done',this.value)"></div>
+              <div style="flex:1"><input type="number" placeholder="正确数" value="${msp.correct||''}" style="width:100%;font-size:.78rem;padding:5px" onchange="updateJobStudy('${mod}','correct',this.value)"></div>
+            </div>
+          </div>`;
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Daily record
+    html += `<div class="card">
+      <div class="card-title">📝 今日刷题记录</div>
+      <div class="inline-form" style="margin-bottom:10px">
+        <div class="form-group" style="flex:1"><select id="studyModSelect" style="width:100%;font-size:.8rem">${subjects.flatMap(s=>s.modules).map(m=>`<option>${m}</option>`).join('')}</select></div>
+        <div class="form-group" style="flex:1"><input type="number" id="studyTodayNum" placeholder="刷题数" style="width:100%;font-size:.8rem"></div>
+        <div class="form-group" style="flex:1"><input type="number" id="studyTodayCorrect" placeholder="正确数" style="width:100%;font-size:.8rem"></div>
+        <button class="btn btn-sm" onclick="addStudyRecord()">➕ 记录</button>
+      </div>
+      <div id="studyRecordList"></div>
+    </div>`;
+
+  } else if(currentJobTab==='apps'){
+    // ===== Tab2: 岗位投递追踪 =====
+    const tracks = [
+      {id:'gov', name:'🏛️ 央国企/事业单位行政岗'},
+      {id:'corp', name:'💼 外企/私企综合岗'},
+      {id:'uniAdmin', name:'🏫 高校行政/辅导员岗'},
+      {id:'uniTeacher', name:'👩‍🏫 高校专任教师岗'}
+    ];
+    const statuses = ['已投递','待笔试','待一面','待二面','终面','offer','未通过'];
+    const statusColors = {'已投递':'badge-gray','待笔试':'badge-blue','待一面':'badge-pink','待二面':'badge-purple','终面':'badge-orange','offer':'badge-green','未通过':'badge-gray'};
+
+    html += `<div class="card"><div class="card-title">📮 岗位投递追踪</div>`;
+    html += `<div style="margin-bottom:12px"><select id="appFilter" onchange="renderJob()" style="width:auto;font-size:.8rem"><option value="">全部进度</option>${statuses.map(s=>`<option>${s}</option>`).join('')}</select></div>`;
+
+    tracks.forEach(t=>{
+      const apps = (store.jobTracks[t.id]?.applications||[]).filter(a=>{
+        const f = $('#appFilter')?.value;
+        return !f || a.status===f;
+      });
+      const totalCount = apps.reduce((s,a)=>s+(parseInt(a.count)||1),0);
+      html += `<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="padding:12px 14px;background:var(--pink-light);font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="toggleAppTrack('${t.id}')">
+          <span contenteditable onblur="updateTrackName('${t.id}',this.textContent)">${t.name}</span>
+          <span class="badge badge-pink">${totalCount}个岗位</span>
+        </div>`;
+      if((store.jobAppExpand||{})[t.id]){
+        html += '<div style="padding:10px 14px">';
+        html += `<div style="display:flex;gap:8px;margin-bottom:10px;font-size:.8rem;flex-wrap:wrap">
+          <input type="text" id="appCompany_${t.id}" placeholder="公司/学校名称" style="flex:1;min-width:120px">
+          <input type="number" id="appCount_${t.id}" placeholder="投递数" value="1" style="width:60px">
+          <select id="appStatus_${t.id}" style="width:auto;font-size:.8rem">${statuses.map(s=>`<option>${s}</option>`).join('')}</select>
+          <input type="text" id="appNote_${t.id}" placeholder="备注（可选）" style="flex:1;min-width:100px">
+          <button class="btn btn-sm" onclick="quickAddJobApp('${t.id}')">➕ 添加</button>
+        </div>`;
+        html += `<table style="width:100%;font-size:.78rem"><thead><tr><th>单位</th><th>投递数</th><th>进度</th><th>备注</th><th></th></tr></thead><tbody>`;
+        apps.forEach((a,i)=>{
+          const gray = a.status==='未通过'?'opacity:.5;text-decoration:line-through':'';
+          html += `<tr style="${gray}">
+            <td><span contenteditable onblur="updateJobApp('${t.id}',${i},'company',this.textContent)">${escapeHtml(a.company||'')}</span></td>
+            <td><input type="number" value="${a.count||1}" style="width:50px;font-size:.72rem" onchange="updateJobApp('${t.id}',${i},'count',this.value)"></td>
+            <td><select style="font-size:.72rem" onchange="updateJobApp('${t.id}',${i},'status',this.value)">${statuses.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+            <td><span contenteditable onblur="updateJobApp('${t.id}',${i},'note',this.textContent)">${escapeHtml(a.note||'')}</span></td>
+            <td><button class="delete-btn" onclick="deleteJobApp('${t.id}',${i})">🗑️</button></td>
+          </tr>`;
+        });
+        if(apps.length===0) html += '<tr><td colspan="5" class="empty-hint">暂无记录，上方快速添加</td></tr>';
+        html += '</tbody></table>';
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+  } else if(currentJobTab==='interview'){
+    // ===== Tab3: 面试准备库 =====
+    const tags = ['自我介绍','结构化问答','反问面试官','行为面','央国企特色题','高校行政/辅导员题','高校教师试讲/说课','面试真题回忆','踩坑记录','面试心得'];
+    const ivs = store.jobInterviewNotes || [];
+    const filterTag = (store.jobInterviewFilter||'');
+
+    html += `<div class="card"><div class="card-title">🎯 面试准备库</div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">`;
+    html += `<button class="btn btn-sm ${!filterTag?'':'btn-ghost'}" onclick="setIvFilter('')">全部</button>`;
+    tags.forEach(t=>{
+      html += `<button class="btn btn-sm ${filterTag===t?'':'btn-ghost'}" onclick="setIvFilter('${t}')">${t}</button>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="inline-form" style="margin-bottom:12px">
+      <div class="form-group" style="flex:1"><select id="ivTagInput" style="width:100%;font-size:.8rem">${tags.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="form-group" style="flex:3"><input type="text" id="ivTextInput" placeholder="输入面试素材..." style="width:100%"></div>
+      <button class="btn btn-sm" onclick="addIvNote()">➕ 添加</button>
+    </div>`;
+
+    const filtered = filterTag ? ivs.filter(n=>n.tag===filterTag) : ivs;
+    filtered.forEach((n,i)=>{
+      const realIdx = ivs.indexOf(n);
+      html += `<div class="note-card">
+        <div class="note-tag"><span class="tag tag-pink">${n.tag}</span></div>
+        <div class="note-content" contenteditable onblur="editIvNote(${realIdx},this.textContent)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escapeHtml(n.text)}</div>
+        <div class="note-actions">
+          <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${escapeHtml(n.text).replace(/'/g,"\'")}');toast('已复制')">📋 复制</button>
+          <button class="delete-btn" onclick="deleteIvNote(${realIdx})">🗑️ 删除</button>
+        </div>
+      </div>`;
+    });
+    if(filtered.length===0) html += '<div class="empty-hint">暂无面试素材</div>';
+    html += '</div>';
+
+  } else if(currentJobTab==='plan'){
+    // ===== Tab4: 备考总规划 =====
+    const stages = [
+      {name:'第一阶段：笔试基础攻坚期', time:'2026.8-2026.9上', tasks:['完成行测五大模块基础理论+专项刷题','搭建申论、教综知识框架','打磨4份赛道专属简历','整理目标企业/院校清单']},
+      {name:'第二阶段：秋招启动投递期', time:'2026.9下-2026.10', tasks:['四大赛道批量开启网申','每日保持刷题手感','准备通用自我介绍与结构化问答','完成首波提前批面试并复盘']},
+      {name:'第三阶段：笔面密集攻坚期', time:'2026.11-2026.12', tasks:['以整套模拟卷为主查漏补缺','跟进秋招补投与面试','按赛道整理面试真题','与论文初稿撰写并行推进']},
+      {name:'第四阶段：冬招补录&寒假冲刺', time:'2027.1-2027.2', tasks:['复盘错题本回炉巩固','跟进补录与冬招提前批','系统梳理面试全题型','开展多轮模拟面试']},
+      {name:'第五阶段：春招&高校岗高峰', time:'2027.3-2027.4', tasks:['春招批量投递','高校行政/教师岗专项强化','完成春招笔试与面试','同步推进论文盲审']},
+      {name:'第六阶段：offer确认与收尾', time:'2027.5', tasks:['多维度对比offer完成决策','跟进剩余待出结果岗位','整理求职全周期资料','完成收尾']}
+    ];
+
+    html += `<div class="card"><div class="card-title">📅 备考全周期规划</div>`;
+    stages.forEach((s,i)=>{
+      html += `<div style="margin-bottom:10px;padding:12px 14px;background:var(--input-bg);border-radius:10px">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:4px">${s.name}</div>
+        <div style="font-size:.78rem;color:var(--pink);margin-bottom:8px">${s.time}</div>`;
+      s.tasks.forEach(t=>{
+        html += `<div style="font-size:.82rem;padding:4px 0;display:flex;align-items:center;gap:6px">
+          <input type="checkbox" ${(store.jobPlanChecks||{})[`stage${i}_${t}`]?'checked':''} onchange="toggleJobPlanCheck('stage${i}_${t}')">
+          <span>${t}</span>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Weekly template
+    html += `<div class="card">
+      <div class="card-title">🔁 固定周度任务模板</div>
+      <div style="display:grid;gap:8px">
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周一</span><span style="font-size:.82rem">行测专项刷题 + 错题整理</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周二</span><span style="font-size:.82rem">岗位投递 + 面试素材整理</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周三</span><span style="font-size:.82rem">行测专项刷题 + 错题整理</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周四</span><span style="font-size:.82rem">岗位投递 + 面试素材整理</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周五</span><span style="font-size:.82rem">行测专项刷题 + 错题整理</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周六</span><span style="font-size:.82rem">整套笔试模拟 + 本周投递复盘</span>
+        </div>
+        <div style="padding:10px 12px;background:var(--input-bg);border-radius:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;min-width:60px">周日</span><span style="font-size:.82rem">一周进度总结，规划下周任务</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  content.innerHTML = html;
+
+  // Render study records if on study tab
+  if(currentJobTab==='study') renderStudyRecords();
+}
+
+function toggleStudySub(id){
+  if(!store.jobStudyExpand) store.jobStudyExpand = {};
+  store.jobStudyExpand[id] = !store.jobStudyExpand[id];
+  saveStore(); renderJob();
+}
+function updateJobStudy(mod,field,val){
+  if(!store.jobStudyProgress) store.jobStudyProgress = {};
+  if(!store.jobStudyProgress[mod]) store.jobStudyProgress[mod] = {};
+  store.jobStudyProgress[mod][field] = val;
+  saveStore(); renderJob();
+}
+function addStudyRecord(){
+  const mod = $('#studyModSelect').value;
+  const num = parseInt($('#studyTodayNum').value)||0;
+  const correct = parseInt($('#studyTodayCorrect').value)||0;
+  if(!num){ toast('请输入刷题数量'); return; }
+  if(!store.jobStudyRecords) store.jobStudyRecords = [];
+  store.jobStudyRecords.push({date:todayKey(), module:mod, num, correct});
+  // Also update progress
+  if(!store.jobStudyProgress) store.jobStudyProgress = {};
+  if(!store.jobStudyProgress[mod]) store.jobStudyProgress[mod] = {total:0,done:0,correct:0};
+  store.jobStudyProgress[mod].done = (parseInt(store.jobStudyProgress[mod].done)||0) + num;
+  store.jobStudyProgress[mod].correct = (parseInt(store.jobStudyProgress[mod].correct)||0) + correct;
+  $('#studyTodayNum').value=''; $('#studyTodayCorrect').value='';
+  saveStore(); renderJob();
+}
+function renderStudyRecords(){
+  const list = $('#studyRecordList');
+  if(!list) return;
+  const recs = (store.jobStudyRecords||[]).filter(r=>r.date===todayKey()).reverse();
+  if(recs.length===0){ list.innerHTML='<div class="empty-hint">今日暂无记录</div>'; return; }
+  let html='';
+  recs.forEach((r,i)=>{
+    const all = store.jobStudyRecords||[];
+    const realIdx = all.indexOf(r);
+    html += `<div class="task-item"><span class="emoji">📝</span><span class="task-text">${r.module} +${r.num}题 (${r.correct}正确)</span><button class="delete-btn" onclick="deleteStudyRec(${realIdx})">🗑️</button></div>`;
+  });
+  list.innerHTML = html;
+}
+function deleteStudyRec(i){
+  store.jobStudyRecords.splice(i,1);
+  saveStore(); renderJob();
+}
+
+function toggleAppTrack(id){
+  if(!store.jobAppExpand) store.jobAppExpand = {};
+  store.jobAppExpand[id] = !store.jobAppExpand[id];
+  saveStore(); renderJob();
+}
+function quickAddJobApp(trackId){
+  const company = $(`#appCompany_${trackId}`).value.trim();
+  const count = parseInt($(`#appCount_${trackId}`).value) || 1;
+  const status = $(`#appStatus_${trackId}`).value;
+  const note = $(`#appNote_${trackId}`).value.trim();
+  if(!company){ toast('请输入公司/学校名称'); return; }
+  if(!store.jobTracks[trackId]) store.jobTracks[trackId] = {applications:[], interviewNotes:[], studyProgress:{}};
+  store.jobTracks[trackId].applications.push({date:todayKey(), company, count, status, note});
+  $(`#appCompany_${trackId}`).value = '';
+  $(`#appCount_${trackId}`).value = '1';
+  $(`#appNote_${trackId}`).value = '';
+  saveStore(); renderJob();
+}
+
+function updateTrackName(trackId, name){
+  const track = tracks.find(t=>t.id===trackId);
+  if(track) track.name = name;
+}
+function updateJobApp(trackId,i,field,val){
+  if(!store.jobTracks[trackId]) return;
+  store.jobTracks[trackId].applications[i][field] = val.trim();
+  saveStore();
+}
+function deleteJobApp(trackId,i){
+  store.jobTracks[trackId].applications.splice(i,1);
+  saveStore(); renderJob();
+}
+
+function setIvFilter(tag){
+  store.jobInterviewFilter = tag;
+  saveStore(); renderJob();
+}
+function addIvNote(){
+  const tag = $('#ivTagInput').value;
+  const text = $('#ivTextInput').value.trim();
+  if(!text){ toast('请输入内容'); return; }
+  if(!store.jobInterviewNotes) store.jobInterviewNotes = [];
+  store.jobInterviewNotes.push({tag, text});
+  $('#ivTextInput').value='';
+  saveStore(); renderJob();
+}
+function editIvNote(i,val){
+  store.jobInterviewNotes[i].text = val.trim();
+  saveStore();
+}
+function deleteIvNote(i){
+  store.jobInterviewNotes.splice(i,1);
+  saveStore(); renderJob();
+}
+
+function toggleJobPlanCheck(key){
+  if(!store.jobPlanChecks) store.jobPlanChecks = {};
+  store.jobPlanChecks[key] = !store.jobPlanChecks[key];
+  saveStore(); renderJob();
+}
+
+/* ========== Check-in (Exercise + English) ========== *//* ========== Check-in (Exercise + English) ========== */
+function renderCheckin(){
+  renderExerciseCal();
+  renderEnglishCal();
+  // Streaks
+  let exStreak=0;
+  for(let d=new Date();;d.setDate(d.getDate()-1)){ const dk=d.toISOString().slice(0,10); if(store.exerciseLog[dk]) exStreak++; else break; }
+  $('#exerciseStreak').textContent = exStreak;
+  let enStreak=0;
+  for(let d=new Date();;d.setDate(d.getDate()-1)){ const dk=d.toISOString().slice(0,10); if(store.englishLog[dk]) enStreak++; else break; }
+  $('#englishStreak').textContent = enStreak;
+
+  // Monthly stats
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7);
+  const exMonthEntries = Object.entries(store.exerciseLog).filter(([k])=>k.startsWith(ym));
+  const exTotalMin = exMonthEntries.reduce((s,[,v])=> s+(parseInt(v.duration)||0), 0);
+  const exWeeks = Math.ceil(now.getDate()/7);
+  const exAvgDays = exWeeks>0 ? (exMonthEntries.length/exWeeks).toFixed(1) : 0;
+  $('#exerciseStats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${exTotalMin}</div><div class="stat-label">月度总时长(分)</div></div>
+    <div class="stat-card"><div class="stat-value">${exAvgDays}</div><div class="stat-label">平均每周天数</div></div>`;
+  // Records
+  const exRecs = $('#exerciseRecords');
+  exRecs.innerHTML = '<div class="card-title" style="font-size:.9rem;margin-bottom:8px">📝 运动记录</div>';
+  exMonthEntries.reverse().forEach(([k,v])=>{
+    exRecs.innerHTML += `<div class="note-card" style="margin-bottom:6px"><div style="font-size:.8rem;color:var(--text-light)">${k}</div><div style="font-size:.85rem">${escapeHtml(v.type)} · ${v.duration}分钟 · ${v.cal}kcal · ${escapeHtml(v.feel||'')}</div></div>`;
+  });
+  if(exMonthEntries.length===0) exRecs.innerHTML += '<div class="empty-hint">本月暂无记录</div>';
+
+  // English stats
+  const enMonthEntries = Object.entries(store.englishLog).filter(([k])=>k.startsWith(ym));
+  const enTotalMin = enMonthEntries.reduce((s,[,v])=> s+(parseInt(v.duration)||0), 0);
+  const enContents = {};
+  enMonthEntries.forEach(([,v])=>{ enContents[v.content] = (enContents[v.content]||0)+1; });
+  $('#englishStats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${enTotalMin}</div><div class="stat-label">月度总时长(分)</div></div>
+    <div class="stat-card"><div class="stat-value">${enMonthEntries.length}</div><div class="stat-label">打卡天数</div></div>`;
+  const enRecs = $('#englishRecords');
+  enRecs.innerHTML = '<div class="card-title" style="font-size:.9rem;margin-bottom:8px">📝 英语练习记录</div>';
+  enMonthEntries.reverse().forEach(([k,v])=>{
+    enRecs.innerHTML += `<div class="note-card" style="margin-bottom:6px"><div style="font-size:.8rem;color:var(--text-light)">${k}</div><div style="font-size:.85rem">${v.content} · ${v.duration}分钟 · ${escapeHtml(v.points||'')}</div>${v.errors?`<div style="font-size:.8rem;color:#dc3545">错题：${escapeHtml(v.errors)}</div>`:''}</div>`;
+  });
+  if(enMonthEntries.length===0) enRecs.innerHTML += '<div class="empty-hint">本月暂无记录</div>';
+
+  // Diet checkin
+  const dc = store.dietCheckin[todayKey()] || {};
+  $('#dietBreakfast').value = dc.breakfast||'';
+  $('#dietLunch').value = dc.lunch||'';
+  $('#dietDinner').value = dc.dinner||'';
+  ['dietBreakfast','dietLunch','dietDinner'].forEach(id=>{
+    $('#'+id).oninput = ()=>{
+      const dk = todayKey();
+      if(!store.dietCheckin[dk]) store.dietCheckin[dk] = {};
+      store.dietCheckin[dk][id.replace('diet','').toLowerCase()] = $('#'+id).value;
+      saveStore();
+    };
+  });
+}
+
+function renderMiniCal(containerId, logObj){
+  const container = $('#'+containerId);
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth();
+  const firstDay = new Date(year,month,1).getDay();
+  const daysInMonth = new Date(year,month+1,0).getDate();
+  const todayDk = todayKey();
+  let html = '<div class="mini-cal" style="max-width:280px">';
+  ['日','一','二','三','四','五','六'].forEach(w=> html += `<div style="text-align:center;font-size:.7rem;color:var(--text-light);padding:2px">${w}</div>`);
+  for(let i=0;i<firstDay;i++) html += '<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dk = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const checked = logObj[dk];
+    const isToday = dk===todayDk;
+    html += `<div class="day ${checked?'checked':''} ${isToday?'today':''}">${d}</div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+function renderExerciseCal(){ renderMiniCal('exerciseCal', store.exerciseLog); }
+function renderEnglishCal(){ renderMiniCal('englishCal', store.englishLog); }
+
+/* ========== Diet ========== */
+function calcBMR(){
+  const p = store.dietProfile;
+  if(!p.height || !p.weight || !p.birth) return 0;
+  const [by,bm] = p.birth.split('-').map(Number);
+  const now = new Date();
+  let age = now.getFullYear()-by;
+  if(now.getMonth()+1<bm || (now.getMonth()+1===bm && now.getDate()<1)) age--;
+  if(p.gender==='female'){
+    return Math.round(655 + 9.6*p.weight + 1.8*p.height - 4.7*age);
+  } else {
+    return Math.round(66 + 13.7*p.weight + 5*p.height - 6.8*age);
+  }
+}
+function calcTDEE(){
+  const bmr = calcBMR();
+  const activity = parseFloat(store.dietProfile.activity) || 1.2;
+  return Math.round(bmr*activity);
+}
+
+function renderDiet(){
+  const p = store.dietProfile;
+  $('#dietGender').value = p.gender||'female';
+  $('#dietBirth').value = p.birth||'';
+  $('#dietHeight').value = p.height||'';
+  $('#dietWeight').value = p.weight||'';
+  $('#dietActivity').value = p.activity||'1.2';
+
+  const bmr = calcBMR();
+  const tdee = calcTDEE();
+  $('#bmrValue').textContent = bmr||'--';
+  $('#tdeeValue').textContent = tdee||'--';
+  $('#recommendCal').textContent = tdee||0;
+
+  // Meal tabs
+  $$('#mealTabs button').forEach(btn=>{
+    btn.classList.remove('btn-ghost');
+    btn.classList.add('btn-ghost');
+    if(btn.dataset.meal === (store.currentMeal||'breakfast')){
+      btn.classList.remove('btn-ghost');
+    }
+    btn.onclick = ()=>{
+      store.currentMeal = btn.dataset.meal;
+      renderDiet();
+    };
+  });
+
+  // AI upload area - always show for photo upload, AI calc button controlled separately
+  $('#aiUploadArea').style.display = 'block';
+  $('#aiCalBtn').style.display = store.settings.aiCal ? 'inline-flex' : 'none';
+
+  // Food list
+  const fList = $('#foodList');
+  const dk = todayKey();
+  const meals = store.dietLog[dk] || {};
+  const mealData = meals[store.currentMeal] || [];
+  fList.innerHTML = '';
+  if(mealData.length===0) fList.innerHTML = '<div class="empty-hint">暂无食物记录</div>';
+  let mealCal = 0;
+  mealData.forEach((f,i)=>{
+    mealCal += parseInt(f.cal)||0;
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.innerHTML = `<span class="emoji">🍽️</span>
+      <span class="task-text">${escapeHtml(f.name)} ${f.weight}g · ${f.cal}kcal</span>
+      <button class="delete-btn" onclick="deleteFood(${i})">🗑️</button>`;
+    fList.appendChild(div);
+  });
+  if(mealData.length>0){
+    const div = document.createElement('div');
+    div.style.cssText = 'text-align:right;font-size:.9rem;font-weight:700;color:var(--pink);padding:6px 0';
+    div.textContent = `小计：${mealCal} kcal`;
+    fList.appendChild(div);
+  }
+
+  // Total cal today
+  let totalCal = 0;
+  Object.values(meals).forEach(meal=>{ (meal||[]).forEach(f=> totalCal += parseInt(f.cal)||0); });
+  $('#totalCalToday').textContent = totalCal;
+  const diff = tdee - totalCal;
+  const diffEl = $('#diffCal');
+  diffEl.textContent = (diff>=0?'+':'')+diff;
+  diffEl.className = 'stat-value ' + (diff>=0 && diff<=200 ? 'cal-ok' : diff<0 ? 'cal-over' : 'cal-under');
+
+  // History
+  renderDietHistory();
+
+  // Weight
+  renderWeightStats();
+
+  // Apply editable labels
+  applyDietLabels();
+}
+
+function renderWeightStats(){
+  const wl = store.weightLog || {};
+  const dates = Object.keys(wl).sort();
+  const today = todayKey();
+
+  // Find today's or latest weight
+  let todayW = wl[today];
+  let latestDate = today;
+  if(todayW === undefined && dates.length > 0){
+    latestDate = dates[dates.length - 1];
+    todayW = wl[latestDate];
+  }
+  $('#weightToday').textContent = todayW !== undefined ? parseFloat(todayW).toFixed(1) : '--';
+
+  // Helper to find weight on a specific date
+  const getW = (d)=> wl[d] !== undefined ? parseFloat(wl[d]) : null;
+
+  // vs yesterday
+  const yest = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  const yestW = getW(yest);
+  const diffDayEl = $('#weightDiffDay');
+  if(todayW !== undefined && yestW !== null){
+    const diff = parseFloat(todayW) - yestW;
+    diffDayEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+    diffDayEl.className = 'stat-value ' + (Math.abs(diff) < 0.1 ? 'cal-ok' : diff < 0 ? 'cal-under' : 'cal-over');
+  } else {
+    diffDayEl.textContent = '--';
+    diffDayEl.className = 'stat-value';
+  }
+
+  // vs last week
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+  let weekW = getW(weekAgo);
+  // If exact date not found, find closest earlier date
+  if(weekW === null && dates.length > 0){
+    for(let i = dates.length - 1; i >= 0; i--){
+      if(dates[i] <= weekAgo){ weekW = parseFloat(wl[dates[i]]); break; }
+    }
+  }
+  const diffWeekEl = $('#weightDiffWeek');
+  if(todayW !== undefined && weekW !== null){
+    const diff = parseFloat(todayW) - weekW;
+    diffWeekEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+    diffWeekEl.className = 'stat-value ' + (Math.abs(diff) < 0.3 ? 'cal-ok' : diff < 0 ? 'cal-under' : 'cal-over');
+  } else {
+    diffWeekEl.textContent = '--';
+    diffWeekEl.className = 'stat-value';
+  }
+
+  // vs last month
+  const monthAgo = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+  let monthW = getW(monthAgo);
+  if(monthW === null && dates.length > 0){
+    for(let i = dates.length - 1; i >= 0; i--){
+      if(dates[i] <= monthAgo){ monthW = parseFloat(wl[dates[i]]); break; }
+    }
+  }
+  const diffMonthEl = $('#weightDiffMonth');
+  if(todayW !== undefined && monthW !== null){
+    const diff = parseFloat(todayW) - monthW;
+    diffMonthEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+    diffMonthEl.className = 'stat-value ' + (Math.abs(diff) < 0.5 ? 'cal-ok' : diff < 0 ? 'cal-under' : 'cal-over');
+  } else {
+    diffMonthEl.textContent = '--';
+    diffMonthEl.className = 'stat-value';
+  }
+
+  // History list (last 7 records)
+  const list = $('#weightHistoryList');
+  const recent = dates.slice(-7).reverse();
+  if(recent.length === 0){
+    list.innerHTML = '<div class="empty-hint">暂无体重记录</div>';
+  } else {
+    let html = '<div style="font-size:.85rem;font-weight:600;margin-bottom:6px" data-editable-label="diet_recent_weight">最近记录</div>';
+    recent.forEach(d=>{
+      let diffStr = '';
+      const idx = dates.indexOf(d);
+      if(idx > 0){
+        const prev = parseFloat(wl[dates[idx-1]]);
+        const cur = parseFloat(wl[d]);
+        const diff = cur - prev;
+        diffStr = ` <span style="font-size:.75rem;color:${diff<0?'var(--success)':diff>0?'var(--pink)':'var(--text-light)'}">${diff>=0?'+':''}${diff.toFixed(1)}</span>`;
+      }
+      html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)">
+        <span style="font-size:.85rem;color:var(--text-light)">${d}</span>
+        <span style="font-weight:600">${parseFloat(wl[d]).toFixed(1)} kg${diffStr}</span>
+        <button class="delete-btn" onclick="deleteWeight('${d}')" style="font-size:.7rem">🗑️</button>
+      </div>`;
+    });
+    list.innerHTML = html;
+  }
+
+  // Set default date
+  $('#weightDate').value = today;
+}
+
+function addWeightRecord(){
+  const date = $('#weightDate').value;
+  const w = parseFloat($('#weightInput').value);
+  if(!date || isNaN(w)){ toast('请输入日期和体重'); return; }
+  if(!store.weightLog) store.weightLog = {};
+  store.weightLog[date] = w;
+  $('#weightInput').value = '';
+  saveStore(); renderDiet();
+  toast('✅ 体重记录成功！');
+}
+
+function deleteWeight(date){
+  if(confirm('确定删除该日体重记录？')){
+    delete store.weightLog[date];
+    saveStore(); renderDiet();
+  }
+}
+
+function applyDietLabels(){
+  const labels = store.dietLabels || {};
+  document.querySelectorAll('#page-diet [data-editable-label]').forEach(el=>{
+    const key = el.dataset.editableLabel;
+    if(labels[key]) el.textContent = labels[key];
+    if(!el.dataset.editableBound){
+      el.dataset.editableBound = '1';
+      el.setAttribute('contenteditable', 'true');
+      el.style.outline = 'none';
+      el.style.cursor = 'text';
+      el.addEventListener('blur', ()=>{
+        const k = el.dataset.editableLabel;
+        if(!store.dietLabels) store.dietLabels = {};
+        store.dietLabels[k] = el.textContent.trim();
+        saveStore();
+      });
+      el.addEventListener('keydown', e=>{
+        if(e.key==='Enter'){ e.preventDefault(); el.blur(); }
+      });
+    }
+  });
+}
+
+function renderDietHistory(){
+  const histDiv = $('#dietHistory');
+  const selectedDate = $('#dietHistoryDate').value || todayKey();
+  $('#dietHistoryDate').value = selectedDate;
+  const meals = store.dietLog[selectedDate] || {};
+  let html = '';
+  let total = 0;
+  const mealNames = {breakfast:'🌅 早餐', lunch:'☀️ 午餐', dinner:'🌙 晚餐', snack:'🍎 加餐'};
+  Object.entries(meals).forEach(([meal,foods])=>{
+    let mealTotal = 0;
+    (foods||[]).forEach(f=> mealTotal += parseInt(f.cal)||0);
+    total += mealTotal;
+    html += `<div style="margin-bottom:8px"><strong>${mealNames[meal]}</strong> <span class="badge badge-pink">${mealTotal}kcal</span></div>`;
+    (foods||[]).forEach(f=>{
+      html += `<div style="font-size:.82rem;color:var(--text-light);padding:2px 0 2px 16px">${escapeHtml(f.name)} ${f.weight}g · ${f.cal}kcal</div>`;
+    });
+  });
+  if(total===0) html = '<div class="empty-hint">该日期暂无记录</div>';
+  else html = `<div style="font-weight:700;color:var(--pink);margin-bottom:10px">总计：${total} kcal</div>` + html;
+  if(selectedDate !== todayKey()){
+    html += `<button class="btn btn-sm btn-danger" style="margin-top:10px" onclick="if(confirm('确定删除该日记录？')){delete store.dietLog['${selectedDate}'];saveStore();renderDiet()}">🗑️ 删除该日记录</button>`;
+  }
+  histDiv.innerHTML = html;
+}
+
+function deleteFood(i){
+  const dk = todayKey();
+  if(!store.dietLog[dk]) store.dietLog[dk] = {};
+  store.dietLog[dk][store.currentMeal].splice(i,1);
+  saveStore(); renderDiet();
+}
+
+/* ========== Finance ========== */
+const finCategories = {
+  income:['兼职课时费','奖学金','补贴','红包','其他收入'],
+  expense:['餐饮','通勤','学习资料','服饰美妆','生活用品','医疗','娱乐','人情往来','其他支出']
+};
+
+function renderFinance(){
+  // Category select
+  const type = $('#finType').value;
+  const catSel = $('#finCategory');
+  catSel.innerHTML = '';
+  finCategories[type].forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    catSel.appendChild(opt);
+  });
+  $('#finDate').value = todayKey();
+
+  // Monthly stats
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7);
+  const monthRecords = store.financeRecords.filter(r=> r.date.startsWith(ym));
+  const income = monthRecords.filter(r=>r.type==='income').reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const expense = monthRecords.filter(r=>r.type==='expense').reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  $('#monthIncome').textContent = '¥'+income.toFixed(2);
+  $('#monthExpense').textContent = '¥'+expense.toFixed(2);
+  $('#monthBalance').textContent = '¥'+(income-expense).toFixed(2);
+  $('#monthBalance').style.color = (income-expense)>=0 ? '#28a745' : '#dc3545';
+
+  // Pie chart
+  renderFinancePie(monthRecords);
+
+  // Records table
+  const filterMonth = $('#finFilterMonth').value;
+  // Populate month filter
+  const months = [...new Set(store.financeRecords.map(r=>r.date.slice(0,7)))].sort().reverse();
+  const prevFilter = filterMonth;
+  $('#finFilterMonth').innerHTML = '<option value="">全部月份</option>' + months.map(m=>`<option value="${m}" ${m===prevFilter?'selected':''}>${m}</option>`).join('');
+  $('#finFilterMonth').value = prevFilter;
+  $('#finFilterMonth').onchange = renderFinance;
+
+  const body = $('#finRecordsBody');
+  let records = store.financeRecords.slice().reverse();
+  if(filterMonth) records = records.filter(r=>r.date.startsWith(filterMonth));
+  body.innerHTML = '';
+  if(records.length===0) body.innerHTML = '<tr><td colspan="6" class="empty-hint">暂无记录</td></tr>';
+  records.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.date}</td>
+      <td><span class="badge ${r.type==='income'?'badge-green':'badge-red'}">${r.type==='income'?'收入':'支出'}</span></td>
+      <td>${escapeHtml(r.category)}</td>
+      <td style="font-weight:700;color:${r.type==='income'?'#28a745':'#dc3545'}">${r.type==='income'?'+':'-'}¥${parseFloat(r.amount).toFixed(2)}</td>
+      <td>${escapeHtml(r.note||'')}</td>
+      <td><button class="delete-btn" onclick="deleteFinance('${r.id}')">🗑️</button></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function renderFinancePie(records){
+  const pie = $('#financePie');
+  const legend = $('#financeLegend');
+  const expenseByCat = {};
+  records.filter(r=>r.type==='expense').forEach(r=>{
+    expenseByCat[r.category] = (expenseByCat[r.category]||0) + parseFloat(r.amount||0);
+  });
+  const total = Object.values(expenseByCat).reduce((s,v)=>s+v,0);
+  if(total===0){
+    pie.style.background = '#e9ecef';
+    pie.style.background = 'conic-gradient(#e9ecef 0% 100%)';
+    legend.innerHTML = '<div style="color:var(--text-light)">暂无支出数据</div>';
+    return;
+  }
+  const colors = ['#ff5b8d','#ff8fab','#ffc107','#28a745','#007bff','#6f42c1','#fd7e14','#20c997','#dc3545'];
+  let gradient = 'conic-gradient(';
+  let acc = 0;
+  let legendHtml = '';
+  let ci = 0;
+  Object.entries(expenseByCat).forEach(([cat,val])=>{
+    const pct = val/total*100;
+    const color = colors[ci%colors.length];
+    gradient += `${color} ${acc}% ${acc+pct}%, `;
+    acc += pct;
+    legendHtml += `<div><span class="dot" style="background:${color}"></span>${cat} ¥${val.toFixed(2)} (${Math.round(pct)}%)</div>`;
+    ci++;
+  });
+  gradient = gradient.slice(0,-2) + ')';
+  pie.style.background = gradient;
+  legend.innerHTML = legendHtml;
+}
+
+function deleteFinance(id){
+  store.financeRecords = store.financeRecords.filter(r=>r.id!==id);
+  saveStore(); renderFinance();
+}
+
+/* ========== Review ========== */
+function renderReview(){
+  const dk = todayKey();
+  $('#rvDate').textContent = dk;
+  const rv = store.reviews[dk] || {};
+  $('#rvDone').value = rv.done||'';
+  $('#rvNotDone').value = rv.notDone||'';
+  $('#rvGain').value = rv.gain||'';
+  $('#rvMood').value = rv.mood||'';
+  $('#rvTomorrow').value = rv.tomorrow||'';
+
+  // Auto save
+  const rvFields = {'rvDone':'done','rvNotDone':'notDone','rvGain':'gain','rvMood':'mood','rvTomorrow':'tomorrow'};
+  Object.entries(rvFields).forEach(([id,field])=>{
+    $('#'+id).oninput = ()=>{
+      if(!store.reviews[dk]) store.reviews[dk] = {};
+      store.reviews[dk][field] = $('#'+id).value;
+      saveStore();
+    };
+  });
+
+  // AI review card
+  $('#aiReviewCard').style.display = store.settings.aiReview ? 'block' : 'none';
+
+  // History
+  const hist = $('#reviewHistory');
+  const sorted = Object.entries(store.reviews).sort((a,b)=>b[0].localeCompare(a[0]));
+  hist.innerHTML = '';
+  if(sorted.length===0) hist.innerHTML = '<div class="empty-hint">暂无历史复盘</div>';
+  sorted.forEach(([dk,rv])=>{
+    const div = document.createElement('div');
+    div.className = 'note-card';
+    div.innerHTML = `<div style="font-weight:700;color:var(--pink);margin-bottom:6px">📅 ${dk}</div>
+      ${rv.done?`<div style="font-size:.82rem;margin-bottom:4px"><strong>✅ 完成：</strong>${escapeHtml(rv.done)}</div>`:''}
+      ${rv.gain?`<div style="font-size:.82rem;margin-bottom:4px"><strong>💡 收获：</strong>${escapeHtml(rv.gain)}</div>`:''}
+      ${rv.tomorrow?`<div style="font-size:.82rem;color:var(--text-light)"><strong>🔧 明日：</strong>${escapeHtml(rv.tomorrow)}</div>`:''}
+      <div class="note-actions"><button class="btn btn-sm btn-ghost" onclick="loadReview('${dk}')">📖 查看/编辑</button>
+      <button class="delete-btn" onclick="deleteReview('${dk}')">🗑️ 删除</button></div>`;
+    hist.appendChild(div);
+  });
+}
+
+function loadReview(dk){
+  const rv = store.reviews[dk];
+  if(!rv) return;
+  if(dk !== todayKey()){
+    // Load into today's review
+    if(!confirm(`加载 ${dk} 的复盘内容到今天？`)) return;
+  }
+  $('#rvDone').value = rv.done||'';
+  $('#rvNotDone').value = rv.notDone||'';
+  $('#rvGain').value = rv.gain||'';
+  $('#rvMood').value = rv.mood||'';
+  $('#rvTomorrow').value = rv.tomorrow||'';
+  toast('已加载复盘内容');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteReview(dk){
+  if(confirm(`确定删除 ${dk} 的复盘？`)){
+    delete store.reviews[dk];
+    saveStore(); renderReview();
+  }
+}
+
+/* ========== Settings ========== */
+function renderSettings(){
+  const fs = store.settings.fontScale;
+  $('#fontSlider').value = fs;
+  $('#fontValue').textContent = fs+'%';
+  $('#aiCalToggle').checked = store.settings.aiCal;
+  $('#aiReviewToggle').checked = store.settings.aiReview;
+  $('#syncServer').value = store.settings.syncServer||'';
+
+  // Auth area
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
+  if(auth.token){
+    $('#syncLoginArea').style.display = 'none';
+    $('#syncLoggedIn').style.display = 'block';
+    $('#syncUserName').textContent = auth.username;
+  } else {
+    $('#syncLoginArea').style.display = 'block';
+    $('#syncLoggedIn').style.display = 'none';
+  }
+
+  // Auto save settings
+  $('#syncServer').oninput = ()=>{ store.settings.syncServer = $('#syncServer').value; saveStore(); };
+
+  renderNavCustom();
+
+  // Check health
+  checkSyncHealth();
+}
+
+function renderNavCustom(){
+  const list = $('#navCustomList');
+  list.innerHTML = '';
+  store.navOrder.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.innerHTML = `<span class="emoji">${item.emoji}</span>
+      <span class="task-text">${item.name}</span>
+      <button class="btn btn-sm btn-ghost" onclick="reorderNav(${i},-1)" ${i===0?'disabled':''}>▲</button>
+      <button class="btn btn-sm btn-ghost" onclick="reorderNav(${i},1)" ${i===store.navOrder.length-1?'disabled':''}>▼</button>
+      <button class="delete-btn" onclick="deleteNav(${i})">🗑️</button>`;
+    list.appendChild(div);
+  });
+}
+
+function deleteNav(i){
+  if(store.navOrder.length<=2){ toast('至少保留2个菜单'); return; }
+  if(confirm(`确定删除「${store.navOrder[i].name}」菜单？`)){
+    store.navOrder.splice(i,1);
+    saveStore();
+    renderNav();
+    renderNavCustom();
+  }
+}
+
+/* ========== Sync (Backend) ========== */
+async function checkSyncHealth(){
+  const server = store.settings.syncServer;
+  if(!server) return;
+  try{
+    const res = await fetch(server+'/api/health');
+    const data = await res.json();
+    if(data.ok){
+      toast('✅ 同步服务已连接');
+    }
+  }catch(e){ /* silent */ }
+}
+
+async function syncRegister(){
+  const server = $('#syncServer').value.trim();
+  const username = $('#syncUser').value.trim();
+  const password = $('#syncPass').value;
+  if(!server || !username || !password){ toast('请填写完整信息'); return; }
+  store.settings.syncServer = server; saveStore();
+  try{
+    const res = await fetch(server+'/api/auth/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    });
+    if(res.status===409){ toast('用户名已存在'); return; }
+    if(!res.ok){ toast('注册失败'); return; }
+    const data = await res.json();
+    localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
+    toast('注册成功！已自动登录');
+    renderSettings();
+  }catch(e){ toast('连接失败，请检查服务器地址'); }
+}
+
+async function syncLogin(){
+  const server = $('#syncServer').value.trim();
+  const username = $('#syncUser').value.trim();
+  const password = $('#syncPass').value;
+  if(!server || !username || !password){ toast('请填写完整信息'); return; }
+  store.settings.syncServer = server; saveStore();
+  try{
+    const res = await fetch(server+'/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    });
+    if(res.status===401){ toast('密码错误'); return; }
+    if(!res.ok){ toast('登录失败'); return; }
+    const data = await res.json();
+    localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
+    toast('登录成功！');
+    renderSettings();
+  }catch(e){ toast('连接失败'); }
+}
+
+async function syncLogout(){
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+  const server = store.settings.syncServer;
+  try{
+    await fetch(server+'/api/auth/logout',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+auth.token}
+    });
+  }catch(e){}
+  localStorage.removeItem(AUTH_KEY);
+  toast('已退出登录');
+  renderSettings();
+}
+
+async function syncPush(){
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+  const server = store.settings.syncServer;
+  if(!auth.token){ toast('请先登录'); return; }
+  try{
+    saveNow();
+    const res = await fetch(server+'/api/sync',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+auth.token},
+      body:JSON.stringify({...store, updatedAt:new Date().toISOString()})
+    });
+    if(res.ok){ toast('✅ 数据已推送到云端'); }
+    else if(res.status===409){
+      const data = await res.json();
+      if(confirm('检测到云端数据更新，是否切换为云端最新数据？')){
+        await syncPull(true);
+      }
+    }
+    else toast('推送失败');
+  }catch(e){ toast('连接失败'); }
+}
+
+async function syncPull(force){
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+  const server = store.settings.syncServer;
+  if(!auth.token){ toast('请先登录'); return; }
+  try{
+    const res = await fetch(server+'/api/sync',{
+      headers:{'Authorization':'Bearer '+auth.token}
+    });
+    if(res.ok){
+      const data = await res.json();
+      if(data.data){
+        const cloudTime = data.data.updatedAt || '';
+        const localTime = store.updatedAt || '';
+        if(!force && cloudTime && localTime && cloudTime > localTime){
+          if(!confirm('检测到云端数据更新，是否切换最新数据？')) return;
+        }
+        store = data.data;
+        saveNow();
+        toast('✅ 已拉取云端数据');
+        navigateTo(currentPage);
+      } else {
+        toast('云端暂无数据');
+      }
+    } else toast('拉取失败');
+  }catch(e){ toast('连接失败'); }
+}
+
+/* ========== AI Food Cal ========== */
+function handleFoodImage(){
+  const fileInput = $('#foodImage');
+  const file = fileInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    $('#foodPreviewImg').src = ev.target.result;
+    $('#foodPreview').style.display = 'block';
+    $('#aiCalBtn').style.display = 'inline-flex';
+    $('#aiResult').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function aiCalcFoodCal(){
+  const fileInput = $('#foodImage');
+  if(!fileInput.files[0]){ toast('请先拍照或上传餐食图片 📸'); return; }
+  const server = store.settings.syncServer;
+  if(!server){ toast('请先在设置中配置同步服务器地址'); return; }
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+  $('#aiResult').innerHTML = '<div style="color:var(--text-light);padding:12px;text-align:center">🔍 AI正在识别食物和热量...</div>';
+  const formData = new FormData();
+  formData.append('image', fileInput.files[0]);
+  try{
+    const res = await fetch(server+'/api/calcFoodCal',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+(auth.token||'')},
+      body:formData
+    });
+    const data = await res.json();
+    if(data.foods && data.foods.length>0){
+      let html = '<div class="card-title" style="font-size:.9rem">✅ 识别结果（点击➕添加到当前餐）</div>';
+      let totalCal = 0;
+      data.foods.forEach((f,i)=>{
+        totalCal += f.cal||0;
+        html += `<div class="task-item" style="background:#fff">
+          <span class="emoji">🍽️</span>
+          <span class="task-text" style="flex:2">${escapeHtml(f.name)}</span>
+          <span style="width:50px;font-size:.78rem">${f.weight||0}g</span>
+          <span class="badge badge-pink">${f.cal}kcal</span>
+          <button class="btn btn-sm" onclick="addAiFood('${escapeHtml(f.name).replace(/'/g,"\\'")}',${f.weight||100},${f.cal})">➕</button>
+        </div>`;
+      });
+      html += `<div style="text-align:right;font-weight:700;color:var(--pink);margin-top:8px">预计总热量：${totalCal} kcal</div>`;
+      if(data.note) html += `<div style="font-size:.78rem;color:var(--text-light);margin-top:4px">${data.note}</div>`;
+      $('#aiResult').innerHTML = html;
+      toast(`识别完成！共${totalCal}kcal`);
+    } else {
+      $('#aiResult').innerHTML = `<div class="empty-hint">😔 未能识别到食物<br><span style="font-size:.78rem">${data.note||'请尝试更清晰的图片，或手动录入'}</span></div>`;
+    }
+  }catch(e){
+    $('#aiResult').innerHTML = '<div class="empty-hint">❌ 识别失败，请检查服务器配置后重试</div>';
+  }
+}
+
+function addAiFood(name,weight,cal){
+  const dk = todayKey();
+  if(!store.dietLog[dk]) store.dietLog[dk] = {};
+  if(!store.dietLog[dk][store.currentMeal]) store.dietLog[dk][store.currentMeal] = [];
+  store.dietLog[dk][store.currentMeal].push({name,weight:weight.toString(),cal:cal.toString()});
+  saveStore();
+  toast('已添加');
+  renderDiet();
+}
+
+async function aiSumReview(){
+  const server = store.settings.syncServer;
+  if(!server){ toast('请先配置服务器地址'); return; }
+  const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7);
+  const monthReviews = Object.entries(store.reviews).filter(([k])=>k.startsWith(ym));
+  if(monthReviews.length===0){ toast('本月暂无复盘记录'); return; }
+  $('#aiReviewResult').innerHTML = '<div style="color:var(--text-light)">🤖 AI总结中...</div>';
+  try{
+    const res = await fetch(server+'/api/sumReview',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+(auth.token||'')},
+      body:JSON.stringify({reviews:monthReviews.map(([k,v])=>({date:k,...v}))})
+    });
+    const data = await res.json();
+    if(data.summary){
+      $('#aiReviewResult').innerHTML = `<div class="note-card" style="background:var(--pink-light)"><div class="note-content" style="white-space:pre-wrap">${escapeHtml(data.summary)}</div></div>`;
+    } else {
+      $('#aiReviewResult').innerHTML = '<div class="empty-hint">总结失败，请稍后重试</div>';
+    }
+  }catch(e){
+    $('#aiReviewResult').innerHTML = '<div class="empty-hint">连接失败，请检查服务器配置</div>';
+  }
+}
+
+/* ========== Data Export/Import ========== */
+function exportData(){
+  saveNow();
+  const blob = new Blob([JSON.stringify(store,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Ran冲冲冲_备份_${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('已导出备份文件');
+}
+
+function importData(file){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(confirm('导入将覆盖当前所有数据，确定继续？')){
+        store = data;
+        saveNow();
+        toast('导入成功');
+        navigateTo(currentPage);
+      }
+    }catch(err){ toast('文件格式错误'); }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData(){
+  if(!confirm('⚠️ 确定要清空所有数据吗？此操作不可恢复！')) return;
+  if(!confirm('再次确认：所有数据将被永久删除！')) return;
+  localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(AUTH_KEY);
+  loadStore();
+  toast('已清空所有数据');
+  navigateTo('home');
+}
+
+/* ========== Event Bindings ========== */
+function bindEvents(){
+  // Mobile sidebar toggle
+  $('#menuBtn').onclick = ()=>{
+    $('#sidebar').classList.toggle('show');
+    $('#navOverlay').classList.toggle('show');
+  };
+  $('#navOverlay').onclick = ()=>{
+    $('#sidebar').classList.remove('show');
+    $('#navOverlay').classList.remove('show');
+  };
+  // Plan
+  $('#addPlanBtn').onclick = ()=>{
+    const text = $('#planInput').value.trim();
+    if(!text) return;
+    store.plans.push({text, category:$('#planCategory').value, done:false});
+    $('#planInput').value='';
+    saveStore(); renderPlans();
+  };
+  $('#planInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#addPlanBtn').click(); });
+  $('#addRoutineBtn').onclick = ()=>{
+    const text = $('#routineInput').value.trim();
+    if(!text) return;
+    store.routines.push({text, cycle:$('#routineCycle').value});
+    $('#routineInput').value='';
+    saveStore(); renderPlans();
+  };
+  $('#routineInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#addRoutineBtn').click(); });
+
+  // Thesis - keep file links and memos
+  $('#addFileLinkBtn').onclick = ()=>{
+    const name = $('#fileLinkName').value.trim();
+    const url = $('#fileLinkUrl').value.trim();
+    if(!name) return;
+    store.fileLinks.push({name,url});
+    $('#fileLinkName').value=''; $('#fileLinkUrl').value='';
+    saveStore(); renderThesis();
+  };
+  $('#addMemoBtn').onclick = ()=>{
+    const text = $('#memoInput').value.trim();
+    if(!text) return;
+    store.memos.push(text);
+    $('#memoInput').value='';
+    saveStore(); renderThesis();
+  };
+
+  // Checkin
+  $('#exCheckinBtn').onclick = ()=>{
+    const dk = todayKey();
+    store.exerciseLog[dk] = {
+      type:$('#exType').value, duration:$('#exDuration').value, cal:$('#exCal').value, feel:$('#exFeel').value
+    };
+    $('#exType').value=''; $('#exDuration').value=''; $('#exCal').value=''; $('#exFeel').value='';
+    saveStore(); renderCheckin(); toast('✅ 运动打卡成功！');
+  };
+  $('#enCheckinBtn').onclick = ()=>{
+    const dk = todayKey();
+    store.englishLog[dk] = {
+      content:$('#enContent').value, duration:$('#enDuration').value,
+      points:$('#enPoints').value, errors:$('#enErrors').value
+    };
+    $('#enDuration').value=''; $('#enPoints').value=''; $('#enErrors').value='';
+    saveStore(); renderCheckin(); toast('✅ 英语打卡成功！');
+  };
+
+  // Diet
+  $('#dietGender').onchange = ()=>{ store.dietProfile.gender=$('#dietGender').value; saveStore(); renderDiet(); };
+  $('#dietBirth').onchange = ()=>{ store.dietProfile.birth=$('#dietBirth').value; saveStore(); renderDiet(); };
+  $('#dietHeight').oninput = ()=>{ store.dietProfile.height=parseFloat($('#dietHeight').value)||0; saveStore(); renderDiet(); };
+  $('#dietWeight').oninput = ()=>{ store.dietProfile.weight=parseFloat($('#dietWeight').value)||0; saveStore(); renderDiet(); };
+  $('#dietActivity').onchange = ()=>{ store.dietProfile.activity=$('#dietActivity').value; saveStore(); renderDiet(); };
+  $('#addFoodBtn').onclick = ()=>{
+    const name = $('#foodName').value.trim();
+    if(!name) return;
+    const dk = todayKey();
+    if(!store.dietLog[dk]) store.dietLog[dk] = {};
+    if(!store.dietLog[dk][store.currentMeal]) store.dietLog[dk][store.currentMeal] = [];
+    store.dietLog[dk][store.currentMeal].push({
+      name, weight:$('#foodWeight').value||'0', cal:$('#foodCal').value||'0'
+    });
+    $('#foodName').value=''; $('#foodWeight').value=''; $('#foodCal').value='';
+    saveStore(); renderDiet();
+  };
+  $('#foodName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#addFoodBtn').click(); });
+  $('#aiCalBtn').onclick = aiCalcFoodCal;
+  $('#cameraBtn').onclick = ()=>{ const fi=$('#foodImage'); fi.removeAttribute('capture'); fi.setAttribute('capture','environment'); fi.click(); };
+  $('#uploadBtn').onclick = ()=>{ const fi=$('#foodImage'); fi.removeAttribute('capture'); fi.click(); };
+  $('#pasteHintBtn').onclick = ()=>{ toast('直接按 Ctrl+V 粘贴截图即可 📋'); };
+  $('#foodImage').onchange = handleFoodImage;
+  // Paste event for screenshot
+  document.addEventListener('paste', (e)=>{
+    if(currentPage!=='diet') return;
+    const items = e.clipboardData?.items;
+    if(!items) return;
+    for(let item of items){
+      if(item.type.startsWith('image/')){
+        e.preventDefault();
+        const file = item.getAsFile();
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        $('#foodImage').files = dt.files;
+        handleFoodImage();
+        toast('📋 已粘贴截图，点击识别按钮开始分析');
+        break;
+      }
+    }
+  });
+  $('#dietHistoryDate').onchange = renderDietHistory;
+  $('#addWeightBtn').onclick = addWeightRecord;
+  $('#weightInput').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#addWeightBtn').click(); });
+
+  // Finance
+  $('#finType').onchange = renderFinance;
+  $('#addFinBtn').onclick = ()=>{
+    const amount = parseFloat($('#finAmount').value);
+    if(!amount){ toast('请输入金额'); return; }
+    store.financeRecords.push({
+      id:uid(), type:$('#finType').value, category:$('#finCategory').value,
+      amount, date:$('#finDate').value, note:$('#finNote').value
+    });
+    $('#finAmount').value=''; $('#finNote').value='';
+    saveStore(); renderFinance();
+    toast('✅ 记账成功！');
+  };
+
+  // Review
+  $('#aiReviewBtn').onclick = aiSumReview;
+
+  // Settings
+  $('#fontSlider').oninput = ()=>{
+    const v = parseInt($('#fontSlider').value);
+    store.settings.fontScale = v;
+    document.documentElement.style.setProperty('--font-scale', v/100);
+    $('#fontValue').textContent = v+'%';
+    saveStore();
+  };
+  $$('[data-font]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const v = parseInt(btn.dataset.font);
+      store.settings.fontScale = v;
+      document.documentElement.style.setProperty('--font-scale', v/100);
+      $('#fontSlider').value = v;
+      $('#fontValue').textContent = v+'%';
+      saveStore();
+    };
+  });
+  $('#aiCalToggle').onchange = ()=>{
+    store.settings.aiCal = $('#aiCalToggle').checked;
+    saveStore(); renderDiet();
+  };
+  $('#aiReviewToggle').onchange = ()=>{
+    store.settings.aiReview = $('#aiReviewToggle').checked;
+    saveStore(); renderReview();
+  };
+  $('#addNavBtn').onclick = ()=>{
+    const emoji = $('#newNavEmoji').value.trim() || '📄';
+    const name = $('#newNavName').value.trim();
+    if(!name) return;
+    const id = 'custom_'+uid();
+    store.navOrder.push({id,emoji,name});
+    $('#newNavEmoji').value=''; $('#newNavName').value='';
+    saveStore(); renderNav(); renderNavCustom();
+    toast('菜单已添加');
+  };
+  $('#exportBtn').onclick = exportData;
+  $('#importBtn').onclick = ()=> $('#importFile').click();
+  $('#importFile').onchange = e=>{ if(e.target.files[0]) importData(e.target.files[0]); };
+  $('#clearBtn').onclick = clearAllData;
+
+  // Sync
+  $('#syncRegisterBtn').onclick = syncRegister;
+  $('#syncLoginBtn').onclick = syncLogin;
+  $('#syncLogoutBtn').onclick = syncLogout;
+  $('#syncPushBtn').onclick = syncPush;
+  $('#syncPullBtn').onclick = syncPull;
+
+  // Home
+  $('#favQuoteBtn').onclick = ()=>{
+    const q = $('#dailyQuote').textContent;
+    if(!store.favQuotes.includes(q)) store.favQuotes.push(q);
+    saveStore();
+    toast('💖 已收藏文案');
+  };
+  $('#treeHoleBtn').onclick = ()=>{
+    const dk = todayKey();
+    store.treeHole[dk] = true;
+    saveStore();
+    fireworks();
+  };
+
+  // Modal
+  $('#modalOverlay').addEventListener('click',e=>{
+    if(e.target===$('#modalOverlay')) $('#modalOverlay').classList.remove('show');
+  });
+
+  // Reduce motion
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.body.classList.add('reduce-motion');
+  }
+}
+
+/* ========== Init ========== */
+function init(){
+  loadStore();
+  // Apply font scale
+  document.documentElement.style.setProperty('--font-scale', (store.settings.fontScale||100)/100);
+  // Check tree hole today
+  const dk = todayKey();
+  if(store.treeHole[dk]){
+    const btn = $('#treeHoleBtn');
+    btn.textContent = '✅ 今日已打卡';
+    btn.disabled = true;
+    btn.style.opacity = 0.6;
+  }
+  renderNav();
+  bindEvents();
+  navigateTo('home');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
