@@ -557,8 +557,8 @@ select{cursor:pointer}
         </div>
         <div class="card">
           <div class="card-title">☁️ 云端同步</div>
-          <div class="form-group"><label>同步服务器地址</label><input type="text" id="syncServer" placeholder="https://your-app.onrender.com" style="width:100%"></div>
-          <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">💡 提示：当前 localhost:8888 仅提供静态文件，没有后端API。如需云端同步，请部署 server.js 到 Render 等平台，然后填写部署后的域名。</div>
+          <div class="form-group"><label>同步服务器地址</label><input type="text" id="syncServer" placeholder="https://yz-growth-station.onrender.com" style="width:100%"></div>
+          <div style="font-size:.75rem;color:var(--pink);margin-top:4px">💡 地址已自动填写。手机端请确认此处与电脑一致：<b>https://yz-growth-station.onrender.com</b></div>
           <div id="syncLoginArea">
             <div class="row">
               <div class="form-group"><label>用户名</label><input type="text" id="syncUser" style="width:100%"></div>
@@ -4272,7 +4272,13 @@ function renderSettings(){
   $('#fontValue').textContent = fs+'%';
   $('#aiCalToggle').checked = store.settings.aiCal;
   $('#aiReviewToggle').checked = store.settings.aiReview;
-  $('#syncServer').value = store.settings.syncServer||'';
+  // 自动检测当前域名作为同步服务器（解决手机端忘记填的问题）
+  const autoServer = location.protocol+'//'+location.host;
+  if(!store.settings.syncServer && location.host !== 'localhost' && !location.host.includes('127.0.0.1') && !location.host.includes('192.168')){
+    store.settings.syncServer = autoServer; saveStore();
+  }
+  const displayServer = store.settings.syncServer||autoServer;
+  if(displayServer!=='http://localhost:8888') $('#syncServer').value = displayServer;
 
   // Auth area
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
@@ -4344,13 +4350,13 @@ async function syncRegister(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username,password})
     });
-    if(res.status===409){ toast('用户名已存在'); return; }
-    if(!res.ok){ toast('注册失败'); return; }
+    if(res.status===409){ toast('⚠️ 用户名已存在，换一个试试'); return; }
     const data = await res.json();
+    if(!res.ok){ toast('⚠️ 注册失败：'+ (data.error||'未知错误')); return; }
     localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
-    toast('注册成功！已自动登录');
+    toast('✅ 注册成功！已自动登录');
     renderSettings();
-  }catch(e){ toast('连接失败，请检查服务器地址'); }
+  }catch(e){ toast('❌ 连接失败：'+e.message+'\n请确认服务器地址正确：'+server); }
 }
 
 async function syncLogin(){
@@ -4365,13 +4371,13 @@ async function syncLogin(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username,password})
     });
-    if(res.status===401){ toast('密码错误'); return; }
-    if(!res.ok){ toast('登录失败'); return; }
+    if(res.status===401){ toast('⚠️ 密码错误，请重试'); return; }
     const data = await res.json();
+    if(!res.ok){ toast('⚠️ 登录失败：'+ (data.error||'未知错误')); return; }
     localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
-    toast('登录成功！');
+    toast('✅ 登录成功！');
     renderSettings();
-  }catch(e){ toast('连接失败'); }
+  }catch(e){ toast('❌ 连接失败：'+e.message); }
 }
 
 async function syncLogout(){
