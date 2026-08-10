@@ -4339,11 +4339,13 @@ async function checkSyncHealth(){
 }
 
 async function syncRegister(){
-  const server = $('#syncServer').value.trim();
   const username = $('#syncUser').value.trim();
   const password = $('#syncPass').value;
-  if(!server || !username || !password){ toast('请填写完整信息'); return; }
+  if(!username || !password){ toast('请填写完整信息'); return; }
+  // 始终用当前页面的域名作为服务器地址，避免手动填写错误
+  const server = location.origin;
   store.settings.syncServer = server; saveStore();
+  $('#syncServer').value = server;
   try{
     const res = await fetch(server+'/api/auth/register',{
       method:'POST',
@@ -4356,22 +4358,24 @@ async function syncRegister(){
     localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
     toast('✅ 注册成功！已自动登录');
     renderSettings();
-  }catch(e){ toast('❌ 连接失败：'+e.message+'\n请确认服务器地址正确：'+server); }
+  }catch(e){ toast('❌ 网络错误：'+e.message+'\n请确认能访问：'+server); }
 }
 
 async function syncLogin(){
-  const server = $('#syncServer').value.trim();
   const username = $('#syncUser').value.trim();
   const password = $('#syncPass').value;
-  if(!server || !username || !password){ toast('请填写完整信息'); return; }
+  if(!username || !password){ toast('请填写完整信息'); return; }
+  // 始终用当前页面的域名作为服务器地址，避免手动填写错误
+  const server = location.origin;
   store.settings.syncServer = server; saveStore();
+  $('#syncServer').value = server;
   try{
     const res = await fetch(server+'/api/auth/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username,password})
     });
-    if(res.status===401){ toast('⚠️ 密码错误，请重试'); return; }
+    if(res.status===401){ toast('⚠️ 用户名或密码错误，请重试'); return; }
     const data = await res.json();
     if(!res.ok){ toast('⚠️ 登录失败：'+ (data.error||'未知错误')); return; }
     localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
@@ -4382,7 +4386,7 @@ async function syncLogin(){
 
 async function syncLogout(){
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
-  const server = store.settings.syncServer;
+  const server = location.origin;
   try{
     await fetch(server+'/api/auth/logout',{
       method:'POST',
@@ -4396,7 +4400,7 @@ async function syncLogout(){
 
 async function syncPush(){
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
-  const server = store.settings.syncServer;
+  const server = location.origin;
   if(!auth.token){ toast('请先登录'); return; }
   try{
     saveNow();
@@ -4418,7 +4422,7 @@ async function syncPush(){
 
 async function syncPull(force){
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
-  const server = store.settings.syncServer;
+  const server = location.origin;
   if(!auth.token){ toast('请先登录'); return; }
   try{
     const res = await fetch(server+'/api/sync',{
