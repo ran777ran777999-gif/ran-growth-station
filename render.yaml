@@ -1,0 +1,23 @@
+# Render 部署配置文件
+# 🌸研三上岸成长站
+# 部署步骤：
+# 1. 将本项目上传至 GitHub 仓库
+# 2. 在 Render Dashboard 新建 Web Service，连接该 GitHub 仓库
+# 3. Render 会自动识别 render.yaml 配置
+# 4. 在环境变量中配置 AI_API_KEY（可选，用于AI卡路里识别和复盘总结）
+# 5. 部署完成后使用 Render 分配的域名即可访问
+
+services:
+  - type: web
+    name: yz-growth-station
+    runtime: node
+    plan: free
+    buildCommand: "true"
+    startCommand: "node server.js"
+    healthCheckPath: /api/health
+    envVars:
+      - key: AI_API_KEY
+        sync: false
+        description: "AI API密钥（可选，用于食物卡路里图片识别和复盘月度AI总结）"
+      - key: NODE_ENV
+        value: production
