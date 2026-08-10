@@ -1,0 +1,23 @@
+{
+  "name": "yz-growth-station",
+  "version": "1.0.0",
+  "description": "🌸研三上岸成长站 - 面向研三国际中文教育女生的个人综合成长工作台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "growth",
+    "thesis",
+    "job-hunting",
+    "diet",
+    "finance",
+    "review"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
