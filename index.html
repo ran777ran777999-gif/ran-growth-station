@@ -558,7 +558,7 @@ select{cursor:pointer}
         <div class="card">
           <div class="card-title">☁️ 云端同步</div>
           <div class="form-group"><label>同步服务器（自动检测，无需修改）</label><input type="text" id="syncServer" placeholder="自动检测中..." readonly style="width:100%;background:var(--bg);color:var(--text-light)"></div>
-          <div style="font-size:.75rem;color:var(--pink);margin-top:4px">💡 地址自动使用当前页面域名。注册/登录/同步都打到同一个服务器，不会出错。</div>
+          <div style="font-size:.75rem;color:var(--pink);margin-top:4px">💡 当前服务器：<b id="syncServerDisplay"></b> | Render免费版15分钟无访问会休眠，账号数据可能被清空。重新点击「登录」即可自动恢复。</div>
           <div id="syncLoginArea">
             <div class="row">
               <div class="form-group"><label>用户名</label><input type="text" id="syncUser" style="width:100%"></div>
@@ -4279,6 +4279,9 @@ function renderSettings(){
   }
   const displayServer = store.settings.syncServer||autoServer;
   if(displayServer!=='http://localhost:8888') $('#syncServer').value = displayServer;
+  // 显示当前服务器地址
+  const displayEl = document.getElementById('syncServerDisplay');
+  if(displayEl) displayEl.textContent = displayServer;
 
   // Auth area
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY) || '{}');
@@ -4365,17 +4368,32 @@ async function syncLogin(){
   const username = $('#syncUser').value.trim();
   const password = $('#syncPass').value;
   if(!username || !password){ toast('请填写完整信息'); return; }
-  // 始终用当前页面的域名作为服务器地址，避免手动填写错误
   const server = location.origin;
   store.settings.syncServer = server; saveStore();
   $('#syncServer').value = server;
   try{
-    const res = await fetch(server+'/api/auth/login',{
+    let res = await fetch(server+'/api/auth/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username,password})
     });
-    if(res.status===401){ toast('⚠️ 用户名或密码错误，请重试'); return; }
+    // Render free tier 重启会清空数据，登录失败时自动尝试重新注册
+    if(res.status===401){
+      const regRes = await fetch(server+'/api/auth/register',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username,password})
+      });
+      if(regRes.ok){
+        const regData = await regRes.json();
+        localStorage.setItem(AUTH_KEY, JSON.stringify({token:regData.token,username}));
+        toast('🍃 检测到服务器重启（账号已自动重建）\n\n账号已恢复，请点击「推送数据」将本地数据同步到云端！');
+        renderSettings();
+        return;
+      } else if(regRes.status===409){
+        toast('⚠️ 密码错误，请重试'); return;
+      }
+    }
     const data = await res.json();
     if(!res.ok){ toast('⚠️ 登录失败：'+ (data.error||'未知错误')); return; }
     localStorage.setItem(AUTH_KEY, JSON.stringify({token:data.token,username}));
@@ -4411,6 +4429,11 @@ async function syncPush(){
     });
     const data = await res.json().catch(()=>({}));
     if(res.ok){ toast('✅ 数据已推送到云端'); }
+    else if(res.status===401){
+      localStorage.removeItem(AUTH_KEY);
+      toast('🍃 登录已过期（服务器可能重启了）\n\n请在设置中点击「登录」按钮重新登录，登录后数据会自动恢复。');
+      renderSettings();
+    }
     else if(res.status===409){
       if(confirm('检测到云端数据更新，是否切换为云端最新数据？')){
         await syncPull(true);
@@ -4443,6 +4466,10 @@ async function syncPull(force){
       } else {
         toast('云端暂无数据');
       }
+    } else if(res.status===401){
+      localStorage.removeItem(AUTH_KEY);
+      toast('🍃 登录已过期（服务器可能重启了）\n\n请在设置中点击「登录」重新登录，数据不会丢失！');
+      renderSettings();
     } else toast('❌ 拉取失败：'+(data.error||res.status));
   }catch(e){ toast('❌ 连接失败：'+e.message); }
 }
