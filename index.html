@@ -557,8 +557,8 @@ select{cursor:pointer}
         </div>
         <div class="card">
           <div class="card-title">☁️ 云端同步</div>
-          <div class="form-group"><label>同步服务器地址</label><input type="text" id="syncServer" placeholder="https://yz-growth-station.onrender.com" style="width:100%"></div>
-          <div style="font-size:.75rem;color:var(--pink);margin-top:4px">💡 地址已自动填写。手机端请确认此处与电脑一致：<b>https://yz-growth-station.onrender.com</b></div>
+          <div class="form-group"><label>同步服务器（自动检测，无需修改）</label><input type="text" id="syncServer" placeholder="自动检测中..." readonly style="width:100%;background:var(--bg);color:var(--text-light)"></div>
+          <div style="font-size:.75rem;color:var(--pink);margin-top:4px">💡 地址自动使用当前页面域名。注册/登录/同步都打到同一个服务器，不会出错。</div>
           <div id="syncLoginArea">
             <div class="row">
               <div class="form-group"><label>用户名</label><input type="text" id="syncUser" style="width:100%"></div>
@@ -4327,7 +4327,7 @@ function deleteNav(i){
 
 /* ========== Sync (Backend) ========== */
 async function checkSyncHealth(){
-  const server = store.settings.syncServer;
+  const server = location.origin;
   if(!server) return;
   try{
     const res = await fetch(server+'/api/health');
@@ -4409,15 +4409,15 @@ async function syncPush(){
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+auth.token},
       body:JSON.stringify({...store, updatedAt:new Date().toISOString()})
     });
+    const data = await res.json().catch(()=>({}));
     if(res.ok){ toast('✅ 数据已推送到云端'); }
     else if(res.status===409){
-      const data = await res.json();
       if(confirm('检测到云端数据更新，是否切换为云端最新数据？')){
         await syncPull(true);
       }
     }
-    else toast('推送失败');
-  }catch(e){ toast('连接失败'); }
+    else toast('❌ 推送失败：'+(data.error||res.status));
+  }catch(e){ toast('❌ 连接失败：'+e.message); }
 }
 
 async function syncPull(force){
@@ -4428,8 +4428,8 @@ async function syncPull(force){
     const res = await fetch(server+'/api/sync',{
       headers:{'Authorization':'Bearer '+auth.token}
     });
+    const data = await res.json().catch(()=>({}));
     if(res.ok){
-      const data = await res.json();
       if(data.data){
         const cloudTime = data.data.updatedAt || '';
         const localTime = store.updatedAt || '';
@@ -4443,8 +4443,8 @@ async function syncPull(force){
       } else {
         toast('云端暂无数据');
       }
-    } else toast('拉取失败');
-  }catch(e){ toast('连接失败'); }
+    } else toast('❌ 拉取失败：'+(data.error||res.status));
+  }catch(e){ toast('❌ 连接失败：'+e.message); }
 }
 
 /* ========== AI Food Cal ========== */
@@ -4465,8 +4465,7 @@ function handleFoodImage(){
 async function aiCalcFoodCal(){
   const fileInput = $('#foodImage');
   if(!fileInput.files[0]){ toast('请先拍照或上传餐食图片 📸'); return; }
-  const server = store.settings.syncServer;
-  if(!server){ toast('请先在设置中配置同步服务器地址'); return; }
+  const server = location.origin;
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
   $('#aiResult').innerHTML = '<div style="color:var(--text-light);padding:12px;text-align:center">🔍 AI正在识别食物和热量...</div>';
   const formData = new FormData();
@@ -4514,7 +4513,7 @@ function addAiFood(name,weight,cal){
 }
 
 async function aiSumReview(){
-  const server = store.settings.syncServer;
+  const server = location.origin;
   if(!server){ toast('请先配置服务器地址'); return; }
   const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
   const now = new Date();
