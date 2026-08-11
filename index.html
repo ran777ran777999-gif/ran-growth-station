@@ -391,6 +391,10 @@ select{cursor:pointer}
         </div>
         <div class="card">
           <div class="card-title" data-editable-label="diet_card_title">🍱 分餐卡路里录入 & 📸 拍照识别</div>
+          <div class="row" style="margin-bottom:10px;align-items:center">
+            <div class="form-group" style="margin-bottom:0"><label>日期</label><input type="date" id="dietDatePicker" style="width:auto"></div>
+            <div id="dietDateLabel" style="font-size:.85rem;color:var(--pink);font-weight:600"></div>
+          </div>
           <div class="row" id="mealTabs" style="margin-bottom:14px">
             <button class="btn btn-sm" data-meal="breakfast" style="flex:1">🌅 早餐</button>
             <button class="btn btn-sm btn-ghost" data-meal="lunch" style="flex:1">☀️ 午餐</button>
@@ -3877,6 +3881,19 @@ function renderDiet(){
   $('#tdeeValue').textContent = tdee||'--';
   $('#recommendCal').textContent = tdee||0;
 
+  // Date picker
+  const datePicker = $('#dietDatePicker');
+  const today = todayKey();
+  if(!store.dietDate) store.dietDate = today;
+  datePicker.value = store.dietDate;
+  datePicker.onchange = ()=>{
+    store.dietDate = datePicker.value;
+    saveStore();
+    renderDiet();
+  };
+  const isToday = store.dietDate === today;
+  $('#dietDateLabel').textContent = isToday ? '今天' : store.dietDate;
+
   // Meal tabs
   $$('#mealTabs button').forEach(btn=>{
     btn.classList.remove('btn-ghost');
@@ -3894,9 +3911,9 @@ function renderDiet(){
   $('#aiUploadArea').style.display = 'block';
   $('#aiCalBtn').style.display = store.settings.aiCal ? 'inline-flex' : 'none';
 
-  // Food list
+  // Food list (use selected date)
   const fList = $('#foodList');
-  const dk = todayKey();
+  const dk = store.dietDate || todayKey();
   const meals = store.dietLog[dk] || {};
   const mealData = meals[store.currentMeal] || [];
   fList.innerHTML = '';
@@ -3918,10 +3935,13 @@ function renderDiet(){
     fList.appendChild(div);
   }
 
-  // Total cal today
+  // Total cal for selected date
   let totalCal = 0;
   Object.values(meals).forEach(meal=>{ (meal||[]).forEach(f=> totalCal += parseInt(f.cal)||0); });
   $('#totalCalToday').textContent = totalCal;
+  // Update label based on selected date
+  const intakeLabel = $('[data-editable-label="diet_label_intake"]');
+  if(intakeLabel) intakeLabel.textContent = isToday ? '今日摄入(kcal)' : '该日摄入(kcal)';
   const diff = tdee - totalCal;
   const diffEl = $('#diffCal');
   diffEl.textContent = (diff>=0?'+':'')+diff;
@@ -4100,8 +4120,9 @@ function renderDietHistory(){
 }
 
 function deleteFood(i){
-  const dk = todayKey();
+  const dk = store.dietDate || todayKey();
   if(!store.dietLog[dk]) store.dietLog[dk] = {};
+  if(!store.dietLog[dk][store.currentMeal]) store.dietLog[dk][store.currentMeal] = [];
   store.dietLog[dk][store.currentMeal].splice(i,1);
   saveStore(); renderDiet();
 }
@@ -4530,7 +4551,7 @@ async function aiCalcFoodCal(){
 }
 
 function addAiFood(name,weight,cal){
-  const dk = todayKey();
+  const dk = store.dietDate || todayKey();
   if(!store.dietLog[dk]) store.dietLog[dk] = {};
   if(!store.dietLog[dk][store.currentMeal]) store.dietLog[dk][store.currentMeal] = [];
   store.dietLog[dk][store.currentMeal].push({name,weight:weight.toString(),cal:cal.toString()});
@@ -4678,7 +4699,7 @@ function bindEvents(){
   $('#addFoodBtn').onclick = ()=>{
     const name = $('#foodName').value.trim();
     if(!name) return;
-    const dk = todayKey();
+    const dk = store.dietDate || todayKey();
     if(!store.dietLog[dk]) store.dietLog[dk] = {};
     if(!store.dietLog[dk][store.currentMeal]) store.dietLog[dk][store.currentMeal] = [];
     store.dietLog[dk][store.currentMeal].push({
