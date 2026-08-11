@@ -312,6 +312,10 @@ select{cursor:pointer}
       <section id="page-checkin" class="page">
         <div class="card">
           <div class="card-title">🏃 运动打卡</div>
+          <div class="inline-form" style="margin-bottom:14px;align-items:center">
+            <div class="form-group" style="margin-bottom:0"><label>日期</label><input type="date" id="exDatePicker" style="width:auto"></div>
+            <div id="exDateLabel" style="font-size:.85rem;color:var(--pink);font-weight:600"></div>
+          </div>
           <div class="row">
             <div class="col">
               <div id="exerciseCal" style="display:flex;justify-content:center"></div>
@@ -324,7 +328,7 @@ select{cursor:pointer}
                 <div class="form-group" style="flex:1"><label>消耗热量(kcal)</label><input type="number" id="exCal" style="width:100%"></div>
               </div>
               <div class="form-group"><label>运动感受</label><input type="text" id="exFeel" placeholder="今日运动感受" style="width:100%"></div>
-              <button class="btn btn-sm" id="exCheckinBtn">✅ 今日运动打卡</button>
+              <button class="btn btn-sm" id="exCheckinBtn">✅ 运动打卡</button>
             </div>
           </div>
           <hr class="section-divider">
@@ -334,6 +338,10 @@ select{cursor:pointer}
         </div>
         <div class="card">
           <div class="card-title">📖 英语每日练习打卡</div>
+          <div class="inline-form" style="margin-bottom:14px;align-items:center">
+            <div class="form-group" style="margin-bottom:0"><label>日期</label><input type="date" id="enDatePicker" style="width:auto"></div>
+            <div id="enDateLabel" style="font-size:.85rem;color:var(--pink);font-weight:600"></div>
+          </div>
           <div class="row">
             <div class="col">
               <div id="englishCal" style="display:flex;justify-content:center"></div>
@@ -346,7 +354,7 @@ select{cursor:pointer}
               <div class="form-group"><label>练习时长(分钟)</label><input type="number" id="enDuration" style="width:100%"></div>
               <div class="form-group"><label>掌握知识点</label><input type="text" id="enPoints" placeholder="今日学到了什么" style="width:100%"></div>
               <div class="form-group"><label>错题记录</label><input type="text" id="enErrors" placeholder="记录错题" style="width:100%"></div>
-              <button class="btn btn-sm" id="enCheckinBtn">✅ 今日英语打卡</button>
+              <button class="btn btn-sm" id="enCheckinBtn">✅ 英语打卡</button>
             </div>
           </div>
           <hr class="section-divider">
@@ -3765,7 +3773,7 @@ function toggleJobPlanCheck(key){
   saveStore(); renderJob();
 }
 
-/* ========== Check-in (Exercise + English) ========== *//* ========== Check-in (Exercise + English) ========== */
+/* ========== Check-in (Exercise + English) ========== */
 function renderCheckin(){
   renderExerciseCal();
   renderEnglishCal();
@@ -3776,6 +3784,52 @@ function renderCheckin(){
   let enStreak=0;
   for(let d=new Date();;d.setDate(d.getDate()-1)){ const dk=d.toISOString().slice(0,10); if(store.englishLog[dk]) enStreak++; else break; }
   $('#englishStreak').textContent = enStreak;
+
+  // Exercise date picker
+  const exPicker = $('#exDatePicker');
+  if(!store.exerciseCheckinDate) store.exerciseCheckinDate = todayKey();
+  exPicker.value = store.exerciseCheckinDate;
+  const exIsToday = store.exerciseCheckinDate === todayKey();
+  $('#exDateLabel').textContent = exIsToday ? '今天' : '';
+  // Pre-fill exercise record for selected date
+  const exRec = store.exerciseLog[store.exerciseCheckinDate];
+  if(exRec){
+    $('#exType').value = exRec.type || '';
+    $('#exDuration').value = exRec.duration || '';
+    $('#exCal').value = exRec.cal || '';
+    $('#exFeel').value = exRec.feel || '';
+    $('#exCheckinBtn').textContent = exIsToday ? '✅ 更新今日运动打卡' : '✅ 更新运动打卡';
+  } else {
+    $('#exType').value = ''; $('#exDuration').value = ''; $('#exCal').value = ''; $('#exFeel').value = '';
+    $('#exCheckinBtn').textContent = exIsToday ? '✅ 今日运动打卡' : '✅ 运动打卡';
+  }
+  exPicker.onchange = ()=>{
+    store.exerciseCheckinDate = exPicker.value;
+    saveStore(); renderCheckin();
+  };
+
+  // English date picker
+  const enPicker = $('#enDatePicker');
+  if(!store.englishCheckinDate) store.englishCheckinDate = todayKey();
+  enPicker.value = store.englishCheckinDate;
+  const enIsToday = store.englishCheckinDate === todayKey();
+  $('#enDateLabel').textContent = enIsToday ? '今天' : '';
+  // Pre-fill english record for selected date
+  const enRec = store.englishLog[store.englishCheckinDate];
+  if(enRec){
+    $('#enContent').value = enRec.content || '单词';
+    $('#enDuration').value = enRec.duration || '';
+    $('#enPoints').value = enRec.points || '';
+    $('#enErrors').value = enRec.errors || '';
+    $('#enCheckinBtn').textContent = enIsToday ? '✅ 更新今日英语打卡' : '✅ 更新英语打卡';
+  } else {
+    $('#enContent').value = '单词'; $('#enDuration').value = ''; $('#enPoints').value = ''; $('#enErrors').value = '';
+    $('#enCheckinBtn').textContent = enIsToday ? '✅ 今日英语打卡' : '✅ 英语打卡';
+  }
+  enPicker.onchange = ()=>{
+    store.englishCheckinDate = enPicker.value;
+    saveStore(); renderCheckin();
+  };
 
   // Monthly stats
   const now = new Date();
@@ -4673,20 +4727,18 @@ function bindEvents(){
 
   // Checkin
   $('#exCheckinBtn').onclick = ()=>{
-    const dk = todayKey();
+    const dk = store.exerciseCheckinDate || todayKey();
     store.exerciseLog[dk] = {
       type:$('#exType').value, duration:$('#exDuration').value, cal:$('#exCal').value, feel:$('#exFeel').value
     };
-    $('#exType').value=''; $('#exDuration').value=''; $('#exCal').value=''; $('#exFeel').value='';
     saveStore(); renderCheckin(); toast('✅ 运动打卡成功！');
   };
   $('#enCheckinBtn').onclick = ()=>{
-    const dk = todayKey();
+    const dk = store.englishCheckinDate || todayKey();
     store.englishLog[dk] = {
       content:$('#enContent').value, duration:$('#enDuration').value,
       points:$('#enPoints').value, errors:$('#enErrors').value
     };
-    $('#enDuration').value=''; $('#enPoints').value=''; $('#enErrors').value='';
     saveStore(); renderCheckin(); toast('✅ 英语打卡成功！');
   };
 
